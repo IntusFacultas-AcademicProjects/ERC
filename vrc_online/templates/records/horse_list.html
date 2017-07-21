@@ -25,6 +25,7 @@
                         <th>Gender</th>
                         <th>Weight</th>
                         <th>Pregnancy Status</th>
+                        <th>Date of Impregnation</th>
                         <th>&nbsp</th>
                     </tr>
                 </thead>
@@ -42,6 +43,7 @@
                             <td>{{horse.get_gender_display}}</td>
                             <td>{{horse.weight|default_if_none:"0"}} lbs</td>
                             <td>{{horse.get_pregnant_display}}</td>
+                            <td>{%if horse.date_of_impregnation %}{{horse.date_of_impregnation}} {% endif %}</td>
                             <td>
                                 <form class="form" action="{% url 'records:delete-horse' pk=horse.id %}">
                                     <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>

@@ -25,6 +25,11 @@ class Horse(models.Model):
         null=True
     )
     dob = models.DateField("Date of Birth")
+    date_of_impregnation = models.DateField(
+        "Date of Impregnation",
+        blank=True,
+        null=True
+    )
     name = models.CharField("Name", max_length=32)
     notes = models.TextField("Notes", max_length=256, blank=True, null=True)
     gender = models.IntegerField("Gender", default=0, choices=GENDER_CHOICES)

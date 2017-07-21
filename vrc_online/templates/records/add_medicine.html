@@ -70,7 +70,7 @@
                                                 Pregnancy Status
                                             </th>
                                             <td>
-                                                {{horse.get_pregnant_display}}
+                                                {{horse.get_pregnant_display}} {%if horse.date_of_impregnation %}, {{horse.date_of_impregnation}} {% endif %}
                                             </td>
                                         </tr>
                                         <tr>
@@ -78,9 +78,7 @@
                                                 Notes
                                             </th>
                                             <td>
-                                                <pre>
                                                     {{horse.notes}}
-                                                </pre>
                                             </td>
                                         </tr>
                                     </tbody>

@@ -22,6 +22,7 @@ class HorseForm(forms.ModelForm):
             'age',
             'weight',
             'dob',
+            'date_of_impregnation',
             'name',
             'notes',
             'gender',
@@ -31,6 +32,8 @@ class HorseForm(forms.ModelForm):
             'age': {"error": ("Age cannot be negative or empty.")},
             'weight': {"error": ("Weight cannot be negative or empty.")},
             'dob': {"error": ("Date of Birth cannot be in the future.")},
+            'date_of_impregnation':
+            {"error": ("Invalid date of impregnation")},
             'name': {"error": ("Name cannot be empty.!")},
             'notes': {"error": ("Invalid characters in notes.")},
             'gender': {"error": ("Invalid gender.")},
@@ -59,6 +62,7 @@ class ScheduleForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(ScheduleForm, self).clean()
         return cleaned_data
+
 
 class CalendarForm(forms.ModelForm):
 

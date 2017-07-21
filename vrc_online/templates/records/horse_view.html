@@ -324,6 +324,26 @@ $(document).ready(function(){
             $("#id_pregnant").prop( "disabled", false );   
         }
     })
+    $("#id_pregnant").change(function() {
+        if ($(this).val() == 0) {
+             $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'Changing the status to "Not Pregnant" will delete the date of impregnation. Continue?',
+                buttons: {
+                    confirm: function () {
+                        $("#id_date_of_impregnation").datepicker("update", "")
+                        
+                    },
+                    cancel: function () {
+                        $("id_pregnant").val("1")
+                    },
+                }
+            });
+        }
+    })
    
 })
 </script>

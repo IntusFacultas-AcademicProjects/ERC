@@ -60,7 +60,7 @@
                                 </div>
                             </div>
                             <div class="row md-form form-group {% if form.weight.errors %} has-errors {% endif %}">
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                     <div class="md-form form-group {% if form.gender.errors %} has-errors {% endif %}">
                                         <label for="{{form.gender.id_for_label}}">{{form.gender.label}}</label><br/><br/>
                                         {% render_field form.gender class+="form-control" %}
@@ -71,13 +71,27 @@
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
                                     <div class="md-form form-group {% if form.pregnant.errors %} has-errors {% endif %}">
                                         <label for="{{form.pregnant.id_for_label}}">{{form.pregnant.label}}</label><br/><br/>
                                         {% render_field form.pregnant class+="form-control" %}
                                     </div>
                                     {% if form.pregnant.errors %}
                                         {%  for error in form.pregnant.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <label for="{{form.date_of_impregnation.id_for_label}}" style="padding-left:15px">{{form.date_of_impregnation.label}}</label><br/>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        {% render_field form.date_of_impregnation class+="form-control" %}
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                    {% if form.date_of_impregnation.errors %}
+                                        {%  for error in form.date_of_impregnation.errors %}
                                              <li style="color:red"> {{ error }} </li>
                                         {% endfor %}
                                     {% endif %}
@@ -130,14 +144,18 @@ $(document).ready(function(){
     if ($("#id_gender").val() == 0) {
         $("#id_pregnant").val("0")
         $("#id_pregnant").prop( "disabled", true );
+        $("#id_date_of_impregnation").prop("disabled", true);
     }
     $("#id_gender").change(function() {
         if ($(this).val() == 0) {
             $("#id_pregnant").val("0")
+            $("#id_date_of_impregnation").datepicker("update", "");
             $("#id_pregnant").prop( "disabled", true );
+            $("#id_date_of_impregnation").prop("disabled", true);
         }
         else {
             $("#id_pregnant").prop( "disabled", false );   
+            $("#id_date_of_impregnation").prop("disabled", false);
         }
     })
    
