@@ -1,0 +1,7 @@
+Django==1.11.3
+-e git+https://github.com/rodrigoamaral/django-fullcalendar.git@d116fcfc2093e57035932a9ea7c111d449fd7e4d#egg=django_fullcalendar
+django-widget-tweaks==1.4.1
+python-dateutil==2.6.1
+pytz==2017.2
+schedule==0.4.3
+six==1.10.0
