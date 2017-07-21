@@ -1,0 +1,150 @@
+/* YOUR CUSTOM STYLES Changed */
+.datepicker-days {
+    display: block !important;
+}
+.deployable-div {
+    max-height: 170.67px;
+    overflow-y:scroll;
+    transition: max-height .3s;
+    -webkit-transition: max-height 2s;
+}
+#calendar {
+    max-height: 200px;
+    margin-top:15px;
+}
+.deployable-div.expand {
+    max-height:580;
+}
+
+.fc-header {
+    background-color: #4285F4!important;
+    color: #FFF!important;
+    padding: .75rem 1.25rem;
+    padding-top: 0.75rem;
+    padding-right: 1.25rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    margin-bottom: 0;
+    background-color: #f7f7f9;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    -ms-border-radius: 2px;
+    -o-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.fc-header-left {
+    border-width:0px !important;
+    padding: .75rem 1.25rem;
+}
+.fc-header-right {
+    border-width:0px !important;
+}
+.fc-header-center {
+    border-width:0px !important;
+}
+
+.fc-button {
+    margin: 4px !important;
+    color: #4285F4 !important;
+    border-color: #4285F4 !important;
+    /*background-color: transparent !important;*/
+    /*position: relative !important;
+    cursor: pointer !important;*/
+    /*overflow: hidden !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    z-index: 1 !important;
+    display: inline-block !important;
+    font-weight: 400 !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;*/
+    border: 1px solid transparent !important;
+    /*padding: .5rem 1rem !important;*/
+    font-size: 1rem !important;
+    border-radius: .25rem !important;
+    /*-webkit-transition: all .2s ease-in-out !important;
+    -o-transition: all .2s ease-in-out !important;
+    transition: all .2s ease-in-out !important;*/
+    box-shadow: 0 5px 11px 0 rgba(0,0,0,.18), 0 4px 15px 0 rgba(0,0,0,.15) !important;
+}
+
+.fc-state-disabled, .fc-state-active {
+    background-color: #e6e6e6 !important;
+}
+
+
+select {
+    border-top:0 !important;
+    border-right:0 !important;
+    border-left:0 !important;
+}
+.group {
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    border: 1px solid transparent;
+    border-radius: 4px;
+    border-color: #337ab7;
+}
+.panel {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
+    border-color: #337ab7;
+    padding: 15px;
+}
+
+.filter-container .filter {
+        display: none;
+        padding: 5px;
+}
+
+/*.filter-collapsed {
+        margin-bottom: 20px;
+        background-color: #fff;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        border-color: #337ab7;
+        padding: 15px;
+}*/
+.filter-container {
+        /*margin-top:-10px;*/
+        margin-bottom: 20px;
+        background-color: #fff;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        box-shadow: 0 1px 1px rgba(0,0,0,.05);
+        border-color: #337ab7;
+        padding: 15px;
+}
+
+.datepicker-days {
+        /*
+        This is a hacky solution to deal with the fact that for some reason
+        bootstrap-datepicker puts a rule:
+                .datepicker > div {
+                        display:none;
+                }
+        that stops the popup from having content.
+        */
+        display: block !important;
+}
+
+label {
+    padding-left:15px;
+}

@@ -1,0 +1,330 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card-block">
+                <h4 class="card-title">What can I do here?</h4>
+                <p class="card-text">Here you can modify the medicine's information, along with add new schedules to the medication and edit/delete old schedules</p>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="card text-center" style="margin-top:15px">
+                <h3 class="card-header default-color-dark white-text">
+                    Edit {{horse.name}}.
+                </h3>
+                <div class="card-block">
+                    <form class="form" action="{% url 'records:review-horse' pk=horse.id %}" method="POST">
+                        <input type="hidden" name="_method" value="HORSE"> 
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="md-form {% if form.name.errors %} has-errors {% endif %}">
+                                <label for="{{form.name.id_for_label}}">{{form.name.label}}</label><br class="br"/>
+                                {% render_field form.name class+="form-control" %}
+                            </div>
+                            {% if form.name.errors %}
+                                {%  for error in form.name.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="row md-form form-group {% if form.dob.errors %} has-errors {% endif %}">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{form.dob.id_for_label}}" style="padding-left:15px">{{form.dob.label}}</label><br/>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        {% render_field form.dob class+="form-control" %}
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                    {% if form.dob.errors %}
+                                        {%  for error in form.dob.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{form.weight.id_for_label}}" style="padding-left:15px;">{{form.weight.label}} in lbs</label><br/>
+                                    {% render_field form.weight class+="form-control" %}
+                                    {% if form.weight.errors %}
+                                        {%  for error in form.weight.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row md-form form-group {% if form.weight.errors %} has-errors {% endif %}">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="md-form form-group {% if form.gender.errors %} has-errors {% endif %}">
+                                        <label for="{{form.gender.id_for_label}}">{{form.gender.label}}</label><br/><br/>
+                                        {% render_field form.gender class+="form-control" %}
+                                    </div>
+                                    {% if form.gender.errors %}
+                                        {%  for error in form.gender.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="md-form form-group {% if form.pregnant.errors %} has-errors {% endif %}">
+                                        <label for="{{form.pregnant.id_for_label}}">{{form.pregnant.label}}</label><br/><br/>
+                                        {% render_field form.pregnant class+="form-control" %}
+                                    </div>
+                                    {% if form.pregnant.errors %}
+                                        {%  for error in form.pregnant.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="md-form form-group {% if form.notes.errors %} has-errors {% endif %}">
+                                        <label for="{{form.notes.id_for_label}}">{{form.notes.label}}</label>
+                                        {% render_field form.notes class+="md-textarea" %}
+                                    </div>
+                                    {% if form.notes.errors %}
+                                        {%  for error in form.notes.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div class="card-footer text-muted default-color-dark white-text">
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="btn btn-primary"/> 
+                    </div>
+                </div>  
+                    </form>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="card text-center" style="margin-top:15px">
+                <h3 class="card-header default-color-dark white-text">
+                    {{horse.name}}'s Current Medications
+                </h3>
+                    <div class="card-block" style="height:528px; overflow-y:scroll">
+                    <form class="form" action="" method="post">
+                    <input type="hidden" name="_method" value="DELETE_MEDICINE"> 
+                        {% csrf_token %}
+                        {% if medicines %}
+                            {% for medicine in medicines %}
+                            <div class="panel panel-info">
+                                <div class="form-group">
+                                    <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" aria-label="..." id={{medicine.id}} name={{medicine.id}}>
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>
+                                                           Name 
+                                                    </th>
+                                                    <td  style="text-align:left">
+                                                            {{medicine.name}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>
+                                                           Notes 
+                                                    </th>
+                                                    <td  style="text-align:left">
+                                                             {{medicine.notes}} 
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Doses</th>
+                                                    <th>Frequency</th>
+                                                    <th>Demographic</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% if schedules|get_item:medicine.id %}
+                                                    {% for schedule in schedules|get_item:medicine.id %}
+                                                        <tr>
+                                                            <td>
+                                                                {{schedule.doses}} doses
+                                                            </td>
+                                                            <td>
+                                                                1 every {{schedule.frequency}} {{schedule.get_interval_display}}
+                                                            </td>
+                                                            <td>
+                                                                {{schedule.get_classification_display}}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor%}
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan=3 style="text-align:center">No schedules have been added for this medicine</td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                    
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <p>No medicines are available. Did you forget to add them?</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>  
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:1em">
+            <div class="card text-center">
+                <h3 class="card-header default-color-dark white-text">
+                    Add Medications
+                </h3>
+                <form class="form" action="" method="post">
+                    <input type="hidden" name="_method" value="ADD_MEDICINE"> 
+                    <div class="card-block" style="height:500px; overflow-y:scroll">
+                        {% csrf_token %}
+                        {% if add_medicines %}
+                            {% for medicine in add_medicines %}
+                            <div class="panel panel-info">
+                                <div class="form-group">
+                                    <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" aria-label="..." id={{medicine.id}} name={{medicine.id}}>
+                                        </span>
+                                    </div>
+                                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>
+                                                           Name 
+                                                    </th>
+                                                    <td  style="text-align:left">
+                                                            {{medicine.name}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>
+                                                           Notes 
+                                                    </th>
+                                                    <td  style="text-align:left">
+                                                             {{medicine.notes}} 
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th style="text-align:center">Doses</th>
+                                                    <th style="text-align:center">Frequency</th>
+                                                    <th style="text-align:center">Demographic</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% if add_schedules|get_item:medicine.id %}
+                                                    {% for schedule in add_schedules|get_item:medicine.id %}
+                                                        <tr>
+                                                            <td>
+                                                                {{schedule.doses}} doses
+                                                            </td>
+                                                            <td>
+                                                                1 every {{schedule.frequency}} {{schedule.get_interval_display}}
+                                                            </td>
+                                                            <td>
+                                                                {{schedule.get_classification_display}}
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor%}
+                                                {% else %}
+                                                    <tr>
+                                                        <td colspan=3 style="text-align:center">No schedules have been added for this medicine</td>
+                                                    </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <p>No unadded medicines are available. Did you forget to make more?</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>  
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('.datepicker').datepicker({
+         format: "yyyy-mm-dd",
+         startDate: '-0d',
+         clearBtn: true,
+         orientation: 'bottom',
+    });
+    if ($("#id_dob").val().indexOf("-") > -1) {
+        var val = $("#id_dob").val().split("-")
+        val = val[1] + "/" + val[2] + "/" + val[0]
+        $("#id_dob").val(val)
+        console.log(val)
+    }
+    if ($("#id_gender").val() == 0) {
+        $("#id_pregnant").val("0")
+        $("#id_pregnant").prop( "disabled", true );
+    }
+    $("#id_gender").change(function() {
+        if ($(this).val() == 0) {
+            $("#id_pregnant").val("0")
+            $("#id_pregnant").prop( "disabled", true );
+        }
+        else {
+            $("#id_pregnant").prop( "disabled", false );   
+        }
+    })
+   
+})
+</script>
+{% endblock js %}

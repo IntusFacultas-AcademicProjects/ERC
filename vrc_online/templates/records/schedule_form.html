@@ -1,0 +1,146 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container" style="margin-top:15px;">
+	<div class="row">
+		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+			<div class="row">
+				<div class="card text-center">
+					<h3 class="card-header default-color-dark white-text">
+						Medicine Information.
+					</h3>
+					<div class="card-block">
+						<div class="row">
+							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+								<table class="table">
+									<tbody>
+										<tr>
+											<th>
+												Name
+											</th>
+											<td>
+												{{med.name}}
+											</td>
+										</tr>
+										<tr>
+											<th>
+												Notes
+											</th>
+											<td>
+												{{med.notes}}
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+								<p> Want to modify this information? Head over to the medicine page from the navbar or the home page! Just don't forget to submit the data on this page first, or you'll lose your progress</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+					<!--Card content-->
+					<div class="card-block">
+						<!--Title-->
+						<h4 class="card-title">Instructions and next steps.</h4>
+						<!--Text-->
+						<p class="card-text" style="height:270px; overflow-y: scroll">This is your opportunity to let us 
+						know when to remind you! As an example: <br /> 
+						"1" for frequency<br />
+						"weeks" for interval <br />
+						"adult" for demographics <br />
+						"2" for doses <br />
+						means we will remind you to put 2 doses, with 1 week between doses. for any adult horse which has this medicine on it's plan. Additionally, you could set another plan with a different frequency for pregnant mares in case you need to give them the medication more often!<br />So using the example above, we would remind you on {{date1}} and {{date2}} to administer the medicine. <br /> We've provided you 2 forms so that you can specify 2 different types of schedules, or 2 different types of demographics. Really anything you can think of! But that doesn't mean you need to fill out both. <br />
+						If you want to add more schedules, just select this medicine from the list later on the "View/Edit Medications" page from the Actions dropdown at the top of the website, or from the option on the home page!</p>
+					</div>
+					<!--/.Card content-->
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+			<form class="form" action="" method="post">
+			{{ formset.management_form }}
+				<div class="card text-center">
+					<h3 class="card-header default-color-dark white-text">
+						Create a Schedule.
+					</h3>
+				</div>
+				<div class="card-block" style="height:500px; overflow-y:scroll">
+					{% csrf_token %}
+					{% for schedule_form in formset %}
+						<div class="panel panel-default">
+							<div class="panel-body">
+									{{ schedule_form.id }}
+									<div class="md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
+										<label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label>
+										{% render_field schedule_form.frequency class+="form-control" %}
+									</div>
+									{% if schedule_form.frequency.errors %}
+										{%  for error in schedule_form.frequency.errors %}
+											 <li style="color:red"> {{ error }} </li>
+										{% endfor %}
+									{% endif %}
+									<div class="md-form form-group {% if schedule_form.interval.errors %} has-errors {% endif %}">  
+										<label for="{{schedule_form.interval.id_for_label}}">{{schedule_form.interval.label}}</label><br />
+										{% render_field schedule_form.interval class+="form-control" %}
+									</div>
+									{% if schedule_form.interval.errors %}
+										{% for error in schedule_form.interval.errors %}
+											 <li style="color:red"> {{ error }} </li>
+										{% endfor %}
+									{% endif %}
+									<div class="md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
+										<label for="{{schedule_form.classification.id_for_label}}">{{schedule_form.classification.label}}</label><br />
+										{% render_field schedule_form.classification class+="form-control" %}
+									</div>
+									{% if schedule_form.classification.errors %}
+										{%  for error in schedule_form.classification.errors %}
+											 <li style="color:red"> {{ error }} </li>
+										{% endfor %}
+									{% endif %}
+									<div class="md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
+										<label for="{{schedule_form.doses.id_for_label}}">{{schedule_form.doses.label}}</label>
+										{% render_field schedule_form.doses class+="form-control" %}
+									</div>
+									{% if schedule_form.doses.errors %}
+										{%  for error in schedule_form.doses.errors %}
+											 <li style="color:red"> {{ error }} </li>
+										{% endfor %}
+									{% endif %}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+				<div class="card-footer text-muted default-color-dark white-text">
+					<div class="form-group">
+						<input type="submit" value="Submit" class="btn btn-primary"/> 
+					</div>
+				</div>	
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("input").on('input', function() {
+	        var $label = $("label[for='"+$(this).attr('id')+"']");
+	        $label.hide()
+	    })
+	    $("input").change(function() {
+	        var $label = $("label[for='"+$(this).attr('id')+"']");
+	        if ($(this).val() == "") {            
+	        $label.show()
+	        }
+	    })
+	})
+</script>
+{% endblock js %}

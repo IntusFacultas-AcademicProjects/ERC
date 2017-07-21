@@ -1,0 +1,89 @@
+{% extends 'records/base.html' %}
+{% load fullcalendar_tags %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top:15px">
+	<div class="row">
+		<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+			<div  class="card">
+				<h3 class="card-header default-color-dark white-text">Creation Toolbar</h3>
+				<div id="actions" class="card-block deployable-div">
+					<h4 class="card-title">Horses, Vaccines, and More</h4>
+					<p class="card-text">Add a new horse or medicine/schedule to the tracker, or update an existing one! Scroll down or expand the panel to see all the things you can do.</p>
+					<div class="list-group">
+						<a href="{% url 'records:create-horse' %}" class="list-group-item list-group-item-action">Add a Horse</a>
+						<a href="{% url 'records:create-medicine' %}" class="list-group-item list-group-item-action">Add a Medication</a>
+						<a href="{% url 'records:horse-list' %}" class="list-group-item list-group-item-action">View/Edit Horses</a>
+						<a href="{% url 'records:medicine-list' %}" class="list-group-item list-group-item-action">View/Edit Medications</a>
+					</div>
+				</div>
+				<div class="card-footer">
+					<div class="container">
+						<div class="float-right">
+							<button id="expandActions" type="button" class="btn btn-sm btn-outline-default waves-effect"><i class="fa fa-plus" aria-hidden="true"></i></button>
+							<button id="minimizeActions" type="button" style="display:none" class="btn btn-sm btn-outline-default waves-effect"><i class="fa fa-minus" aria-hidden="true"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12"
+			<!--Panel-->
+			<div class="card text-center">
+				<h3 class="card-header default-color-dark white-text">
+					Today at a glance.
+				</h3>
+				<div class="card-block">
+					<h4 class="card-title">Special title treatment</h4>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a class="btn btn-default">Go somewhere</a>
+				</div>
+				<div class="card-footer text-muted default-color-dark white-text">
+					<p>{{today}}</p>
+				</div>
+			</div>
+			<!--/.Panel-->
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div style="height: 700px; overflow-y: hidden;">
+				{% calendar %}
+			 </div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/JavaScript">
+	$(document).ready(function() {
+		$(".fc-state-disabled").css("background-image", "blank")
+	});
+	$.fn.enterKey = function (fnc) {
+	    return this.each(function () {
+	        $(this).keypress(function (ev) {
+	            var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+	            if (keycode == '13') {
+	                fnc.call(this, ev);
+	            }
+	        })
+	    })
+	}
+	$("#navSearch").enterKey(function() {
+		$(this).closest("form").submit()
+	})
+	$('#expandActions').click(function() {
+		// $("#actions").removeClass('deployable-div')
+		$("#actions").css("max-height", 580);
+	    $('#minimizeActions').show();
+	    $("#expandActions").hide();
+	});
+	$('#minimizeActions').click(function() {
+		// $('#actions').addClass('deployable-div')
+		$("#actions").css("max-height", 165.67);
+	    $('#expandActions').show();
+	    $("#minimizeActions").hide();
+	});
+</script>
+{% endblock js %}

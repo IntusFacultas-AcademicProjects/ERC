@@ -1,0 +1,166 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card-block">
+                <h4 class="card-title">What can I do here?</h4>
+                <p class="card-text">Here you can modify the medicine's information, along with adding and removing schedules from the medicine's plan. Want to add new schedules? There are 2 blank forms at the bottom of the right pane! As a reminder: <br /> 
+                        "1" for frequency<br />
+                        "weeks" for interval <br />
+                        "adult" for demographics <br />
+                        "2" for doses <br />
+                        means we will remind you to put 2 doses, with 1 week between doses. for any adult horse which has this medicine on it's plan.</p>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="card text-center" style="margin-top:15px">
+                <h3 class="card-header default-color-dark white-text">
+                    Edit {{medicine.name}}.
+                </h3>
+                <div class="card-block" style="height:528px">
+                    <form class="form" action="{% url 'records:review-medicine' pk=medicine.id %}" method="POST">
+                        <input type="hidden" name="_method" value="MEDICINE"> 
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="md-form {% if form.name.errors %} has-errors {% endif %}">
+                                <label for="{{form.name.id_for_label}}">{{form.name.label}}</label><br class="br"/>
+                                {% render_field form.name class+="form-control" %}
+                            </div>
+                            {% if form.name.errors %}
+                                {%  for error in form.name.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="row md-form form-group {% if form.notes.errors %} has-errors {% endif %}">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <label for="{{form.notes.id_for_label}}" style="padding-left:15px">{{form.notes.label}}</label><br/>
+                                {% render_field form.notes class+="md-textarea" %}
+                                {% if form.notes.errors %}
+                                    {%  for error in form.notes.errors %}
+                                         <li style="color:red"> {{ error }} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                </div>
+                <div class="card-footer text-muted default-color-dark white-text">
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="btn btn-primary"/> 
+                    </div>
+                </div>  
+                    </form>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <div class="card text-center" style="margin-top:15px">
+                <h3 class="card-header default-color-dark white-text">
+                    Edit {{medicine.name}}'s Schedules 
+                </h3>
+                    <div class="card-block" style="height:528px; overflow-y:scroll">
+                    <form class="form" action="" method="post">
+                        {{ formset.management_form }}
+                        <input type="hidden" name="_method" value="EDIT_SCHEDULES"> 
+                        {% csrf_token %}
+                        {% for schedule_form in formset %}
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                    {% for hidden in schedule_form.hidden_fields %}
+                                        {{ hidden }}
+                                    {% endfor %}
+                                    <div class="row md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
+                                        <div class="col-lg-2 col-md-4 col-sm-5 col-xs-6">
+                                            <label style="margin-left:1em" for="{{schedule_form.DELETE.id_for_label}}">{{schedule_form.DELETE.label}}</label><br/><br/>
+                                            {% render_field schedule_form.DELETE %}
+                                        </div>
+                                        <div class="col-lg-10 col-md-8 col-sm-7 col-xs-6">
+                                            <label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label><br />
+                                            {% render_field schedule_form.frequency class+="form-control" %}
+                                        </div>
+                                    </div>
+                                    {% if schedule_form.frequency.errors %}
+                                        {%  for error in schedule_form.frequency.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="md-form form-group {% if schedule_form.interval.errors %} has-errors {% endif %}">  
+                                        <label for="{{schedule_form.interval.id_for_label}}">{{schedule_form.interval.label}}</label><br />
+                                        {% render_field schedule_form.interval class+="form-control" %}
+                                    </div>
+                                    {% if schedule_form.interval.errors %}
+                                        {% for error in schedule_form.interval.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
+                                        <label for="{{schedule_form.classification.id_for_label}}">{{schedule_form.classification.label}}</label><br />
+                                        {% render_field schedule_form.classification class+="form-control" %}
+                                    </div>
+                                    {% if schedule_form.classification.errors %}
+                                        {%  for error in schedule_form.classification.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
+                                        <label for="{{schedule_form.doses.id_for_label}}">{{schedule_form.doses.label}}</label><br />
+                                        {% render_field schedule_form.doses class+="form-control" %}
+                                    </div>
+                                    {% if schedule_form.doses.errors %}
+                                        {%  for error in schedule_form.doses.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>  
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('.datepicker').datepicker({
+         format: "yyyy-mm-dd",
+         startDate: '-0d',
+         clearBtn: true,
+         orientation: 'bottom',
+    });
+    if ($("#id_dob").val().indexOf("-") > -1) {
+        var val = $("#id_dob").val().split("-")
+        val = val[1] + "/" + val[2] + "/" + val[0]
+        $("#id_dob").val(val)
+        console.log(val)
+    }
+    if ($("#id_gender").val() == 0) {
+        $("#id_pregnant").val("0")
+        $("#id_pregnant").prop( "disabled", true );
+    }
+    $("#id_gender").change(function() {
+        if ($(this).val() == 0) {
+            $("#id_pregnant").val("0")
+            $("#id_pregnant").prop( "disabled", true );
+        }
+        else {
+            $("#id_pregnant").prop( "disabled", false );   
+        }
+    })
+   
+})
+</script>
+{% endblock js %}

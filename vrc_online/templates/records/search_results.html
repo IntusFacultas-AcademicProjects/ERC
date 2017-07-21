@@ -1,0 +1,157 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="container panel" style="margin-top:15px; padding:55px">
+            <div class="row">
+                <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+                    <div class="card-block">
+                        <h4 class="card-title">What's this?</h4>
+                        <p class="card-text" >These are the horses who's names or notes matched your search or part of your search.</p> 
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>&nbsp</th>
+                                <th>Name</th>
+                                <th>Date of Birth</th>
+                                <th>Age</th>
+                                <th>Gender</th>
+                                <th>Weight</th>
+                                <th>Pregnancy Status</th>
+                                <th>&nbsp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if horses|length > 0 %}
+                            {% for horse in horses %}
+                                {% with horse.id as num %}
+                                <tr>
+                                    <td>
+                                        <a class="btn btn-primary btn-sm" href="{% url 'records:review-horse' pk=horse.id %}">Review</a>
+                                    </td>
+                                    <td>{{horse.name}}</td>
+                                    <td>{{horse.dob}}</td>
+                                    <td>{{years|get_item:num}} Years {{months|get_item:num}} Months</td>
+                                    <td>{{horse.get_gender_display}}</td>
+                                    <td>{{horse.weight|default_if_none:"0"}} lbs</td>
+                                    <td>{{horse.get_pregnant_display}}</td>
+                                    <td>
+                                        <form class="form" action="{% url 'records:delete-horse' pk=horse.id %}">
+                                            <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endwith %}
+                            {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" style="text-align:center">
+                                        No horses have been created yet.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="container panel" style="margin-top:15px; padding:55px">
+            <div class="row">
+                <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+                    <div class="card-block">
+                        <h4 class="card-title">What's this?</h4>
+                        <p class="card-text" >These are the medicines who's names or notes matched your search or part of your search. </p>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                    <table class="table table-hover" style="margin-top:1.4em;">
+                        <thead>
+                            <tr>
+                                <th>&nbsp</th>
+                                <th>Name</th>
+                                <th>Notes</th>
+                                <th>Schedules</th>
+                                <th>&nbsp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if medicines|length > 0 %}
+                            {% for medicine in medicines %}
+                                <tr>
+                                    <td>
+                                        <a class="btn btn-primary btn-sm" href="{% url 'records:review-medicine' pk=medicine.id %}"
+>Review</a>
+                                    </td>
+                                    <td>{{medicine.name}}</td>
+                                    <td>{{medicine.notes}}</td>
+                                    <td>
+                                    {% for schedule in schedules|get_item:medicine.id %}
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            {{schedule.doses}} dose(s), 1 every {{schedule.frequency}} {{schedule.get_interval_display}} for {{schedule.get_classification_display}}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    </td>
+                                    <td>
+                                        <form class="form" action="{% url 'records:delete-medicine' pk=medicine.id %}">
+                                            <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center">
+                                        No medicines have been created yet.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+        $(".submitter").click(function() {
+            $form =  $(this).closest("form")
+            $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'This action cannot be undone!',
+                buttons: {
+                    confirm: function () {
+                        $form.submit()
+                        
+                    },
+                    cancel: function () {
+                        
+                    },
+                }
+            });
+        })
+        
+    }) 
+</script>
+{% endblock js %}

@@ -1,0 +1,168 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container-fluid" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+            <div class="card-block">
+                <h4 class="card-title">What's this?</h4>
+                <p class="card-text" >This is where you can review your medicines.
+                Click "Review" on any entry to edit their information and schedules. Click "Delete" on the right to delete that medication. </p>
+            </div>
+        </div>
+    </div>
+    {% include 'partials/medicine_filter.html' %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>&nbsp</th>
+                        <th>Name</th>
+                        <th>Notes</th>
+                        <th>Schedules</th>
+                        <th>&nbsp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if medicines|length > 0 %}
+                    {% for medicine in medicines %}
+                        <tr>
+                            <td>
+                                <a class="btn btn-primary btn-sm" href="{% url 'records:review-medicine' pk=medicine.id %}">Review</a>
+                            </td>
+                            <td>{{medicine.name}}</td>
+                            <td>{{medicine.notes}}</td>
+                            <td>
+                            {% for schedule in schedules|get_item:medicine.id %}
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    {{schedule.doses}} dose(s), 1 every {{schedule.frequency}} {{schedule.get_interval_display}} for {{schedule.get_classification_display}}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            </td>
+                            <td>
+                                <form class="form" action="{% url 'records:delete-medicine' pk=medicine.id %}">
+                                    <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center">
+                                No medicines have been created yet.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+$(document).ready(function() {
+        $("#resetButton").click(function() {
+            $("#keyword").val("")
+            $("#frequency").val("")
+            $("#doses").val("")
+            $("#interval").val("")
+            $("#classification").val("")
+            $(".label").show()
+        })
+        $("input").on('input', function() {
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            $label.hide()
+        })
+        $("input").change(function() {
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() == "") {            
+            $label.show()
+            }
+        })
+        
+        if ($("#keyword").val() != ""         || $("#frequency").val() != ""   ||
+            $("#doses").val() != ""           || $("#interval").val() != ""    || 
+            $("#classification").val() != "" ) {
+                if ($("#keyword").val() != "") {
+                    var $label = $("label[for='"+$("#keyword").attr('id')+"']")
+                    $label.hide()
+                }
+                if ($("#frequency").val() != "") {
+                    var $label = $("label[for='"+$("#frequency").attr('id')+"']")
+                    $label.hide()
+                }
+                if ($("#doses").val() != "") {
+                    var $label = $("label[for='"+$("#doses").attr('id')+"']")
+                    $label.hide()
+                }
+                if ($("#interval").val() != "") {
+                    var $label = $("label[for='"+$("#interval").attr('id')+"']")
+                    $label.hide()
+                }
+                if ($("#classification").val() != "") {
+                    var $label = $("label[for='"+$("#classification").attr('id')+"']")
+                    $label.hide()
+                }
+                $header = $(".filter-collapsed");
+                $content = $header.next();
+
+                $content.slideToggle(500, function () {
+                    if ($content.is(":visible")) {
+                        $(".fa-chevron-up").css("display","inline-block");
+                        $(".fa-chevron-down").css("display", "none");
+                    }
+                    else {
+                        $(".fa-chevron-up").css("display", "none");
+                        $(".fa-chevron-down").css("display","inline-block");
+                    }
+                });
+        }
+        $(".filter-collapsed").click(function () {
+
+            $header = $(".filter-collapsed");
+            $content = $header.next();
+
+            $content.slideToggle(500, function () {
+
+                    if ($content.is(":visible")) {
+                            $(".fa-chevron-up").css("display","inline-block");
+                            $(".fa-chevron-down").css("display", "none");
+                    }
+                    else {
+                            $(".fa-chevron-up").css("display", "none");
+                            $(".fa-chevron-down").css("display","inline-block");
+                    }
+
+
+            });
+
+        });
+        $(".submitter").click(function() {
+            $form =  $(this).closest("form")
+            $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'This action cannot be undone!',
+                buttons: {
+                    confirm: function () {
+                        $form.submit()
+                        
+                    },
+                    cancel: function () {
+                        
+                    },
+                }
+            });
+        })
+        
+    }) 
+</script>
+{% endblock js %}

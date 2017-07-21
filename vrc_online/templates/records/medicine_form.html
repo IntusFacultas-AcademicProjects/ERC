@@ -1,0 +1,77 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container" style="margin-top:15px;">
+	<div class="row">
+		<div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		    <!--Card content-->
+		    <div class="card-block">
+		        <!--Title-->
+		        <h4 class="card-title">Instructions and next steps.</h4>
+		        <!--Text-->
+		        <p class="card-text">Fill in at least the name of medicine.
+		        The notes section is there for you to write down any miscellaneous
+		        information you might want to remember such as storage conditions,
+		        price, etc.<br /> Once you finish creating the medicine, you'll
+		        have a chance to add a schedule to it on the next screen. After 
+		        that, you will be able to add the medicine to an existing horse's
+		        medicine plan.</p>
+		    </div>
+		    <!--/.Card content-->
+		</div>
+	</div>
+	<div class='row'>
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card text-center" style="margin-top:15px">
+				<h3 class="card-header default-color-dark white-text">
+					Create a medication.
+				</h3>
+				<div class="card-block">
+					<form  class="form" action="" method="post">
+						{% csrf_token %}
+						<div class="md-form {% if form.name.errors %} has-errors {% endif %}">
+							<label for="{{form.name.id_for_label}}">{{form.name.label}}</label>
+							{% render_field form.name class+="form-control" %}
+						</div>
+						{% if form.name.errors %}
+					        {%  for error in form.name.errors %}
+					            {{ error }}
+					        {% endfor %}
+					    {% endif %}
+						<div class="md-form form-group {% if form.notes.errors %} has-errors {% endif %}">
+							<label for="{{form.notes.id_for_label}}">{{form.notes.label}}</label>
+							{% render_field form.notes class+="md-textarea" %}
+						</div>
+						{% if form.notes.errors %}
+					        {%  for error in form.notes.errors %}
+					            {{ error }}
+					        {% endfor %}
+					    {% endif %}
+						<div class="form-group">
+							<input type="submit" value="Submit" class="btn btn-primary"/> 
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("input").on('input', function() {
+	        var $label = $("label[for='"+$(this).attr('id')+"']");
+	        $label.hide()
+	    })
+	    $("input").change(function() {
+	        var $label = $("label[for='"+$(this).attr('id')+"']");
+	        if ($(this).val() == "") {            
+	        $label.show()
+	        }
+	    })
+	})
+</script>
+{% endblock js %}

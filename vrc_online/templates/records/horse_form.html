@@ -1,0 +1,146 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card-block">
+                <h4 class="card-title">Instructions and next steps.</h4>
+                <p class="card-text">Fill in at least the name, age, date of birth, gender, and pregnant status (if a mare) of the Horse.
+                The notes section is there for you to write down any miscellaneous
+                information you might want to remember such as exercise programs,
+                feeding programs, etc.<br /> Once you finish inputting the horse's information, you'll
+                have a chance to add a medicine to it's plan on the next screen.</p>
+            </div>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card text-center" style="margin-top:15px">
+                <h3 class="card-header default-color-dark white-text">
+                    Create a Horse.
+                </h3>
+                <div class="card-block">
+                    <form class="form" action="" method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="md-form {% if form.name.errors %} has-errors {% endif %}">
+                                <label for="{{form.name.id_for_label}}">{{form.name.label}}</label>
+                                {% render_field form.name class+="form-control" %}
+                            </div>
+                            {% if form.name.errors %}
+                                {%  for error in form.name.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <div class="row md-form form-group {% if form.dob.errors %} has-errors {% endif %}">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{form.dob.id_for_label}}" style="padding-left:15px">{{form.dob.label}}</label><br/>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        {% render_field form.dob class+="form-control" %}
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                    {% if form.dob.errors %}
+                                        {%  for error in form.dob.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{form.weight.id_for_label}}" style="padding-left:15px;">{{form.weight.label}}</label><br/>
+                                    {% render_field form.weight class+="form-control" %}
+                                    {% if form.weight.errors %}
+                                        {%  for error in form.weight.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row md-form form-group {% if form.weight.errors %} has-errors {% endif %}">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="md-form form-group {% if form.gender.errors %} has-errors {% endif %}">
+                                        <label for="{{form.gender.id_for_label}}">{{form.gender.label}}</label><br/><br/>
+                                        {% render_field form.gender class+="form-control" %}
+                                    </div>
+                                    {% if form.gender.errors %}
+                                        {%  for error in form.gender.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <div class="md-form form-group {% if form.pregnant.errors %} has-errors {% endif %}">
+                                        <label for="{{form.pregnant.id_for_label}}">{{form.pregnant.label}}</label><br/><br/>
+                                        {% render_field form.pregnant class+="form-control" %}
+                                    </div>
+                                    {% if form.pregnant.errors %}
+                                        {%  for error in form.pregnant.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="md-form form-group {% if form.notes.errors %} has-errors {% endif %}">
+                                        <label for="{{form.notes.id_for_label}}">{{form.notes.label}}</label>
+                                        {% render_field form.notes class+="md-textarea" %}
+                                    </div>
+                                    {% if form.notes.errors %}
+                                        {%  for error in form.notes.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+$("input").on('input', function() {
+    var $label = $("label[for='"+$(this).attr('id')+"']");
+    $label.hide()
+})
+$("input").change(function() {
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        if ($(this).val() == "") {            
+        $label.show()
+        }
+    })
+$(document).ready(function(){
+    $('.datepicker input').datepicker({
+         format: "yyyy-mm-dd",
+         startDate: '-0d',
+         clearBtn: true,
+         orientation: 'bottom',
+    });
+    if ($("#id_gender").val() == 0) {
+        $("#id_pregnant").val("0")
+        $("#id_pregnant").prop( "disabled", true );
+    }
+    $("#id_gender").change(function() {
+        if ($(this).val() == 0) {
+            $("#id_pregnant").val("0")
+            $("#id_pregnant").prop( "disabled", true );
+        }
+        else {
+            $("#id_pregnant").prop( "disabled", false );   
+        }
+    })
+   
+})
+</script>
+{% endblock js %}

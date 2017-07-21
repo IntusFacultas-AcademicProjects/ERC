@@ -1,0 +1,129 @@
+<div class="filter-container" style="margin-top:20px; margin-bottom:30px;">
+    <div class="filter-collapsed">
+        <div class="row">
+            <div class="col-sm-3">
+                <h3 style="margin-left:4px">Filter Options</h3>
+            </div>
+            <div class="col-sm-8"></div>
+            <div class="col-sm-1">
+                <i class="fa fa-chevron-down fa-2x" style="margin-top:17px" aria-hidden="true"></i>
+                <i class="fa fa-chevron-up fa-2x" style="margin-top:17px; display:none;" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+    <div class="filter" style="padding:5px">
+        <form class="form" action="{% url 'records:horse-list' %}" method="GET">
+            <div class="row md-form form-group">
+                <div class="col-lg-7 col-md-7 col-sm-7 col-xs-7 group">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <p style="text-align:center"><strong>Age Range</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label class="label" for="lower_age"  >Lower age</label class="label">
+                             <input class="form-control" {% if lower_age is not None %} value="{{lower_age}}" {% endif %} type="number" id="lower_age" name="lower_age" />
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            <label class="label" for=""  >to</label class="label">
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                            <label class="label" for="upper_age"  >Upper age</label class="label">
+                            <input class="form-control" {% if upper_age is not None %} value="{{upper_age}}" {% endif %} type="number" id="upper_age" name="upper_age" />
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                            <label class="label" for="age_class "  >Unit of Time</label class="label"><br/>
+                            <select name="age_class" class="form-control" id="age_class">
+                                <option value="0" {% if age_class == "0" %} selected="selected" {% endif %}>Months</option>
+                                <option value="1" {% if age_class == "1" %} selected="selected" {% endif %}>Years</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5 group" >
+                     <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <p style="text-align:center"><strong>Weight Range in lbs</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <label class="label" for="weight_lower"  >Lower weight</label class="label">
+                             <input class="form-control" type="number" {% if weight_lower is not None %} value="{{weight_lower}}" {% endif %} id="weight_lower" name="weight_lower" />
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            <label class="label" for=""  >to</label class="label">
+                        </div>
+                        <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                            <label class="label" for="weight_upper"  >Upper weight</label class="label">
+                             <input class="form-control" type="number" {% if weight_upper is not None %} value="{{weight_upper}}" {% endif %} id="weight_upper" name="weight_upper" />
+                        </div>
+                    </div>
+                </div>            
+            </div>
+            <div class="row md-form form-group">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="pregnant"  >Pregnancy status</label class="label"><br/>
+                   <select name="pregnant" class="form-control" id="pregnant">
+                        <option value="" {% if pregnant is None %}selected="selected" {% endif %}>Either</option>
+                        <option value="0"{% if pregnant == "0" %}selected="selected" {% endif %} >Not Pregnant</option>
+                        <option value="1"{% if pregnant == "1" %}selected="selected" {% endif %}>Pregnant</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="gender"  >Gender</label class="label"><br/>
+                    <select name="gender" class="form-control" id="gender">
+                        <option value=""  {% if gender is None %} selected="selected" {% endif %}>Any</option>
+                        <option value="0" {% if gender == "0" %} selected="selected" {% endif %}>Stallion</option>
+                        <option value="1" {% if gender == "1" %} selected="selected" {% endif %}>Mare</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="keyword"  >Keyword</label class="label">
+                     <input class="form-control" {% if keyword is not None %} value="{{keyword}}" {% endif %} type="text" id="keyword" name="keyword" />
+                </div>
+            </div>
+            <div class="row md-form form-group">
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 group" style="padding-bottom: 25px">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <p style="text-align:center"><strong>Age Range</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="input-group input-daterange">
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                    <label class="label" for="start "  >Start Date</label class="label">
+                                    <input type="text" style="width:100%" {% if start is not None %} value="{{start}}" {% endif %} name="start" id="start" class="datepicker form-control">
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                    <div class="input-group-addon">to</div>
+                                </div>
+                                <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">
+                                    <label class="label" for="end "  >End Date</label class="label">
+                                    <input type="text" style="width:100%" {% if end is not None %} value="{{end}}" {% endif %} name="end" id="end" class="datepicker form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row md-form form-group">
+                <div class="col-lg-5 col-md-4 col-sm-3 col-xs-2">
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                    <input type="submit" value="Submit" class="btn btn-primary"/> 
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                    <a type="button" href="{% url 'records:horse-list' %}" class="btn btn-warning">Reset</a>
+                </div>
+                <div class="col-lg-4 col-md-3 col-sm-2 col-xs-1">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

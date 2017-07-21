@@ -1,0 +1,66 @@
+<div class="filter-container" style="margin-top:20px; margin-bottom:30px;">
+    <div class="filter-collapsed">
+        <div class="row">
+            <div class="col-sm-3">
+                <h3 style="margin-left:4px">Filter Options</h3>
+            </div>
+            <div class="col-sm-8"></div>
+            <div class="col-sm-1">
+                <i class="fa fa-chevron-down fa-2x" style="margin-top:17px" aria-hidden="true"></i>
+                <i class="fa fa-chevron-up fa-2x" style="margin-top:17px; display:none;" aria-hidden="true"></i>
+            </div>
+        </div>
+    </div>
+    <div class="filter" style="padding:5px">
+        <form class="form" action="{% url 'records:medicine-list' %}" method="GET">
+            <div class="row md-form form-group">
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="keyword"  >Keyword</label class="label">
+                     <input class="form-control" {% if keyword is not None %} value="{{keyword}}" {% endif %} type="text" id="keyword" name="keyword" />
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="frequency"  >Dose Frequency</label class="label">
+                     <input class="form-control" type="number" {% if frequency is not None %} value="{{frequency}}" {% endif %} id="frequency" name="frequency" />
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                    <label class="label" for="interval"  >Interval</label class="label"><br/>
+                    <select name="interval" class="form-control" id="interval">
+                          <option value="" {% if interval is None %}selected="selected" {% endif %} >Any</option>
+                          <option value="0" {% if interval == "0" %}selected="selected" {% endif %}>Weeks</option>
+                          <option value="1" {% if interval == "1" %}selected="selected" {% endif %}>Months</option>
+                          <option value="2" {% if interval == "2" %}selected="selected" {% endif %}>Years</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row md-form form-group">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="label" for="doses"  ># of Doses</label class="label">
+                     <input class="form-control" type="number" {% if doses is not None %} value="{{doses}}" {% endif %} id="doses" name="doses" />
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <label class="label" for="classification">Demographic</label class="label"><br/>
+                    <select name="classification" class="form-control" id="classification">
+                        <option value="" {% if classification is None %}selected="selected" {% endif %}>Any</option>
+                        <option value="0" {% if classification == "0" %}selected="selected" {% endif %}>Foals</option>
+                        <option value="1" {% if classification == "1" %}selected="selected" {% endif %}>Adults</option>
+                        <option value="2" {% if classification == "2" %}selected="selected" {% endif %}>Pregnant Mares</option>
+                    </select>
+                </div>
+            </div>    
+            <div class="row md-form form-group">
+                <div class="col-lg-5 col-md-4 col-sm-3 col-xs-2">
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                    <input type="submit" value="Submit" class="btn btn-primary"/> 
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                </div>
+                <div class="col-lg-1 col-md-2 col-sm-3 col-xs-4">
+                    <a type="button" href="{% url 'records:medicine-list' %}" class="btn btn-warning">Reset</a>
+                </div>
+                <div class="col-lg-4 col-md-3 col-sm-2 col-xs-1">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

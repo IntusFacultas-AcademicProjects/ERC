@@ -1,0 +1,178 @@
+{% extends 'records/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container-fluid" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+            <div class="card-block">
+                <h4 class="card-title">What's this?</h4>
+                <p class="card-text" >This is where you can review your horses.
+                Click "Review" on any entry to edit their biological information and medical plans. Click "Delete" on the right to delete that horse.</p> 
+            </div>
+        </div>
+    </div>
+    {% include 'partials/filter.html' %}
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>&nbsp</th>
+                        <th>Name</th>
+                        <th>Date of Birth</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Weight</th>
+                        <th>Pregnancy Status</th>
+                        <th>&nbsp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if horses|length > 0 %}
+                    {% for horse in horses %}
+                        {% with horse.id as num %}
+                        <tr>
+                            <td>
+                                <a class="btn btn-primary btn-sm" href="{% url 'records:review-horse' pk=horse.id %}">Review</a>
+                            </td>
+                            <td>{{horse.name}}</td>
+                            <td>{{horse.dob}}</td>
+                            <td>{{years|get_item:num}} Years {{months|get_item:num}} Months</td>
+                            <td>{{horse.get_gender_display}}</td>
+                            <td>{{horse.weight|default_if_none:"0"}} lbs</td>
+                            <td>{{horse.get_pregnant_display}}</td>
+                            <td>
+                                <form class="form" action="{% url 'records:delete-horse' pk=horse.id %}">
+                                    <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endwith %}
+                    {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" style="text-align:center">
+                                No horses have been created yet.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#resetButton").click(function() {
+            $("#keyword").val("")
+            $("#weight_upper").val("")
+            $("#pregnant").val("")
+            $("#upper_age").val("")
+            $("#end").datepicker("update", "")
+            $("#weight_lower").val("")
+            $("#gender").val("")
+            $("#lower_age").val("")
+            $("#start").datepicker("update", "")
+            $("#age_class").val("0")
+            $(".label").show()
+        })
+        $("input").on('input', function() {
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            $label.hide()
+        })
+        $("input").change(function() {
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() == "") {            
+            $label.show()
+            }
+        })
+        if ($("#keyword").val() != ""       || $("#weight_lower").val() != "" ||
+            $("#weight_upper").val() != ""  || $("#gender").val() != "" || 
+            $("#pregnant").val() != ""      || $("#lower_age").val() != "" || 
+            $("#upper_age").val() != ""     || $("#start").val() != "" || 
+            $("#end").val() != "") {
+                if ($("#keyword").val() != "") { 
+                    var $label = $("label[for='"+$("#keyword").attr('id')+"']");
+                    $label.hide()
+                }
+                if ($("#weight_upper").val() != "") { 
+                    var $label = $("label[for='"+$("#weight_upper").attr('id')+"']");
+                    $label.hide()
+                }
+                if ($("#upper_age").val() != "") {
+                    var $label = $("label[for='"+$("#upper_age").attr('id')+"']");
+                    $label.hide()
+                }
+                if ($("#weight_lower").val() != "") { 
+                    var $label = $("label[for='"+$("#weight_lower").attr('id')+"']");
+                    $label.hide()
+                }
+                if ($("#lower_age").val() != "") {
+                    var $label = $("label[for='"+$("#lower_age").attr('id')+"']");
+                    $label.hide()
+                }
+                $header = $(".filter-collapsed");
+                $content = $header.next();
+
+                $content.slideToggle(500, function () {
+                    if ($content.is(":visible")) {
+                        $(".fa-chevron-up").css("display","inline-block");
+                        $(".fa-chevron-down").css("display", "none");
+                    }
+                    else {
+                        $(".fa-chevron-up").css("display", "none");
+                        $(".fa-chevron-down").css("display","inline-block");
+                    }
+                });
+        }
+        // Format works here but not in normal datepicker...
+        $('.input-daterange input').each(function() {
+            $(this).datepicker();
+        });
+        $(".filter-collapsed").click(function () {
+
+            $header = $(".filter-collapsed");
+            $content = $header.next();
+
+            $content.slideToggle(500, function () {
+
+                    if ($content.is(":visible")) {
+                            $(".fa-chevron-up").css("display","inline-block");
+                            $(".fa-chevron-down").css("display", "none");
+                    }
+                    else {
+                            $(".fa-chevron-up").css("display", "none");
+                            $(".fa-chevron-down").css("display","inline-block");
+                    }
+
+
+            });
+
+        });
+        $(".submitter").click(function() {
+            $form =  $(this).closest("form")
+            $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'This action cannot be undone!',
+                buttons: {
+                    confirm: function () {
+                        $form.submit()
+                        
+                    },
+                    cancel: function () {
+                        
+                    },
+                }
+            });
+        })
+        
+    }) 
+</script>
+{% endblock js %}
