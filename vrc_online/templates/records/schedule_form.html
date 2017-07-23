@@ -37,7 +37,7 @@
 						</div>
 						<div class="row">
 							<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-								<p> Want to modify this information? Head over to the medicine page from the navbar or the home page! Just don't forget to submit the data on this page first, or you'll lose your progress</p>
+								<p style="margin-top:15px"> Want to modify this information? Head over to the medicine page from the navbar or the home page! Just don't forget to submit the data on this page first, or you'll lose your progress</p>
 							</div>
 						</div>
 					</div>
@@ -51,13 +51,8 @@
 						<h4 class="card-title">Instructions and next steps.</h4>
 						<!--Text-->
 						<p class="card-text" style="height:270px; overflow-y: scroll">This is your opportunity to let us 
-						know when to remind you! As an example: <br /> 
-						"1" for frequency<br />
-						"weeks" for interval <br />
-						"adult" for demographics <br />
-						"2" for doses <br />
-						means we will remind you to put 2 doses, with 1 week between doses. for any adult horse which has this medicine on it's plan. Additionally, you could set another plan with a different frequency for pregnant mares in case you need to give them the medication more often!<br />So using the example above, we would remind you on {{date1}} and {{date2}} to administer the medicine. <br /> We've provided you 2 forms so that you can specify 2 different types of schedules, or 2 different types of demographics. Really anything you can think of! But that doesn't mean you need to fill out both. <br />
-						If you want to add more schedules, just select this medicine from the list later on the "View/Edit Medications" page from the Actions dropdown at the top of the website, or from the option on the home page!</p>
+						know when to remind you! <br>A quick reminder of how this works: medicines made on this page will have their reminder dates scheduled based on when the horse was born <strong>except</strong> for medicines for pregnant mares. Those will be scheduled based on when the mare is impregnated .<br> If you need to add a medicine with a custom start date, head over to the horse list and select the horse, then click "Temporary Medicines"<br>
+						If you want to add more than 2 schedules, just select this medicine from the list later on the "View/Edit Medications" page from the Actions dropdown at the top of the website, or from the option on the home page!</p>
 					</div>
 					<!--/.Card content-->
 				</div>
@@ -76,43 +71,55 @@
 					{% for schedule_form in formset %}
 						<div class="panel panel-default">
 							<div class="panel-body">
-									{{ schedule_form.id }}
-									<div class="md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
-										<label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label>
-										{% render_field schedule_form.frequency class+="form-control" %}
-									</div>
-									{% if schedule_form.frequency.errors %}
-										{%  for error in schedule_form.frequency.errors %}
-											 <li style="color:red"> {{ error }} </li>
-										{% endfor %}
-									{% endif %}
-									<div class="md-form form-group {% if schedule_form.interval.errors %} has-errors {% endif %}">  
-										<label for="{{schedule_form.interval.id_for_label}}">{{schedule_form.interval.label}}</label><br />
-										{% render_field schedule_form.interval class+="form-control" %}
-									</div>
-									{% if schedule_form.interval.errors %}
-										{% for error in schedule_form.interval.errors %}
-											 <li style="color:red"> {{ error }} </li>
-										{% endfor %}
-									{% endif %}
-									<div class="md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
-										<label for="{{schedule_form.classification.id_for_label}}">{{schedule_form.classification.label}}</label><br />
-										{% render_field schedule_form.classification class+="form-control" %}
-									</div>
-									{% if schedule_form.classification.errors %}
-										{%  for error in schedule_form.classification.errors %}
-											 <li style="color:red"> {{ error }} </li>
-										{% endfor %}
-									{% endif %}
-									<div class="md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
+								{{ schedule_form.id }}
+								<div class="row md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
+									<div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
 										<label for="{{schedule_form.doses.id_for_label}}">{{schedule_form.doses.label}}</label>
 										{% render_field schedule_form.doses class+="form-control" %}
+										{% if schedule_form.doses.errors %}
+											{%  for error in schedule_form.doses.errors %}
+												 <li style="color:red"> {{ error }} </li>
+											{% endfor %}
+										{% endif %}
 									</div>
-									{% if schedule_form.doses.errors %}
-										{%  for error in schedule_form.doses.errors %}
-											 <li style="color:red"> {{ error }} </li>
-										{% endfor %}
-									{% endif %}
+									<div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+										<p style="margin-top:15px">doses, 1 every</p>
+									</div>
+								</div>
+								<div class="row md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label>
+										{% render_field schedule_form.frequency class+="form-control" %}
+										{% if schedule_form.frequency.errors %}
+											{%  for error in schedule_form.frequency.errors %}
+												 <li style="color:red"> {{ error }} </li>
+											{% endfor %}
+										{% endif %}
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+										<label for="{{schedule_form.interval.id_for_label}}">{{schedule_form.interval.label}}</label><br />
+										{% render_field schedule_form.interval class+="form-control" %}
+										{% if schedule_form.interval.errors %}
+											{% for error in schedule_form.interval.errors %}
+												 <li style="color:red"> {{ error }} </li>
+											{% endfor %}
+										{% endif %}
+									</div>
+								</div>
+								<div class="row md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
+									<div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+										<p style="margin-top:15px">for </p>
+									</div>
+									<div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+										<label for="{{schedule_form.classification.id_for_label}}">{{schedule_form.classification.label}}</label><br />
+										{% render_field schedule_form.classification class+="form-control" %}
+										{% if schedule_form.classification.errors %}
+											{%  for error in schedule_form.classification.errors %}
+												 <li style="color:red"> {{ error }} </li>
+											{% endfor %}
+										{% endif %}
+									</div>
+								</div>
 							</div>
 						</div>
 					{% endfor %}
@@ -139,6 +146,12 @@
 	            }
 	        })  
 	    })
+	    $('input[type=number]').each(function(){
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() != "") {
+                $label.hide()
+            }
+        })
 		$("input").on('input', function() {
 	        var $label = $("label[for='"+$(this).attr('id')+"']");
 	        $label.hide()

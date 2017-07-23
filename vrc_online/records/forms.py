@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from .models import Horse, Medicine, Schedule, CalendarEvent
+from .models import Horse, Medicine, Schedule, CalendarEvent, MedicalEvent
 from django.core.exceptions import ValidationError
 import datetime
 
@@ -10,6 +10,13 @@ class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
         fields = ('name', 'notes',)
+
+
+class MedicalForm(forms.ModelForm):
+
+    class Meta:
+        model = MedicalEvent
+        fields = ('msg', 'date')
 
 
 class TemporaryMedicineForm(forms.ModelForm):
@@ -73,6 +80,16 @@ class HorseForm(forms.ModelForm):
         if cleaned_data.get("dob") > datetime.date.today():
             self.add_error("dob", self.fields['dob'].error_messages['error'])
             raise ValidationError(self.fields['dob'].error_messages['error'])
+        if cleaned_data.get("pregnant") == Horse.PREGNANT:
+            if cleaned_data.get("date_of_impregnation", None) == "" or \
+                    cleaned_data.get("date_of_impregnation", None) is None:
+                self.add_error(
+                    "date_of_impregnation",
+                    "This cannot be blank if the mare is pregnant"
+                )
+                raise ValidationError(
+                    "This cannot be blank if the mare is pregnant"
+                )
         return cleaned_data
 
 

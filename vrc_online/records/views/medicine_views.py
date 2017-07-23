@@ -7,9 +7,64 @@ from django.contrib import messages
 from django.db.models import Q
 
 from records.forms import MedicineForm, ScheduleFormSet, \
-    TemporaryMedicineForm
-from records.models import Medicine, Horse
-from records.utils import create_event, delete_event, update_event
+    TemporaryMedicineForm, MedicalForm
+from records.models import Medicine, Horse, MedicalEvent
+from records.utils import create_event, delete_event, update_event,\
+    update_history, delete_temp_event
+
+
+class MedicalHistory(View):
+
+    def get(self, request, pk):
+        horse = Horse.objects.get(pk=pk)
+        update_history(horse)
+        medicalhistory = horse.history.events.all()
+        form = MedicalForm()
+        return render(
+            request,
+            'records/medical_history.html',
+            {
+                "horse": horse,
+                "events": medicalhistory,
+                "form": form
+            }
+        )
+
+    def post(self, request, pk):
+        parameters = request.POST.copy()
+        del parameters['csrfmiddlewaretoken']
+        horse = Horse.objects.get(pk=pk)
+        form = MedicalForm(parameters)
+        if not form.is_valid():
+            medicalhistory = horse.history.events.all()
+            return render(
+                request,
+                'records/medical_history.html',
+                {
+                    "horse": horse,
+                    "events": medicalhistory,
+                    "form": form
+                }
+            )
+        MedicalEvent.objects.create(
+            date=form.cleaned_data.get("date"),
+            msg=form.cleaned_data.get("msg"),
+            history=horse.history)
+        messages.success(request, "Event added to medical history.")
+        return HttpResponseRedirect(
+            reverse_lazy("records:medical-history", kwargs={"pk": pk}))
+
+
+def delete_medical_event(request, pk, cpk):
+    event = MedicalEvent.objects.get(pk=cpk)
+    if event:
+        event.delete()
+        messages.success(request, "Record successfully deleted.")
+        return HttpResponseRedirect(reverse_lazy("records:medical-history",
+                                                 kwargs={"pk": pk}))
+    messages.error(request, "Record does not exist.")
+    return HttpResponseRedirect(reverse_lazy("records:medical-history",
+                                             kwargs={"pk": pk}))
 
 
 class MedicineList(View):
@@ -221,7 +276,7 @@ def delete_medicine(request, pk):
 def delete_temp_medicine(request, pk, med):
     medicine = Medicine.objects.get(pk=med)
     if medicine:
-        delete_event(horse=Horse.objects.get(pk=pk), medicine=medicine)
+        delete_temp_event(horse=Horse.objects.get(pk=pk), medicine=medicine)
         medicine.delete()
         messages.success(request, "Medicine successfully deleted.")
         return HttpResponseRedirect(

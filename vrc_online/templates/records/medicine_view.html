@@ -73,48 +73,55 @@
                                     {% for hidden in schedule_form.hidden_fields %}
                                         {{ hidden }}
                                     {% endfor %}
-                                    <div class="row md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
-                                        <div class="col-lg-2 col-md-4 col-sm-5 col-xs-6">
-                                            <label style="margin-left:1em" for="{{schedule_form.DELETE.id_for_label}}">{{schedule_form.DELETE.label}}</label><br/><br/>
-                                            {% render_field schedule_form.DELETE %}
-                                        </div>
-                                        <div class="col-lg-10 col-md-8 col-sm-7 col-xs-6">
-                                            <label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label><br />
-                                            {% render_field schedule_form.frequency class+="form-control" %}
-                                        </div>
+                                    {{ schedule_form.id }}
+                                <div class="row md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
+                                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                        <label for="{{schedule_form.doses.id_for_label}}">{{schedule_form.doses.label}}</label>
+                                        {% render_field schedule_form.doses class+="form-control" %}
+                                        {% if schedule_form.doses.errors %}
+                                            {%  for error in schedule_form.doses.errors %}
+                                                 <li style="color:red"> {{ error }} </li>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if schedule_form.frequency.errors %}
-                                        {%  for error in schedule_form.frequency.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <div class="md-form form-group {% if schedule_form.interval.errors %} has-errors {% endif %}">  
+                                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <p style="margin-top:15px">doses, 1 every</p>
+                                    </div>
+                                </div>
+                                <div class="row md-form form-group {% if schedule_form.frequency.errors %} has-errors {% endif %}">
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                        <label for="{{schedule_form.frequency.id_for_label}}">{{schedule_form.frequency.label}}</label>
+                                        {% render_field schedule_form.frequency class+="form-control" %}
+                                        {% if schedule_form.frequency.errors %}
+                                            {%  for error in schedule_form.frequency.errors %}
+                                                 <li style="color:red"> {{ error }} </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
                                         <label for="{{schedule_form.interval.id_for_label}}">{{schedule_form.interval.label}}</label><br />
                                         {% render_field schedule_form.interval class+="form-control" %}
+                                        {% if schedule_form.interval.errors %}
+                                            {% for error in schedule_form.interval.errors %}
+                                                 <li style="color:red"> {{ error }} </li>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if schedule_form.interval.errors %}
-                                        {% for error in schedule_form.interval.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <div class="md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
+                                </div>
+                                <div class="row md-form form-group {% if schedule_form.classification.errors %} has-errors {% endif %}">
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                        <p style="margin-top:15px">for </p>
+                                    </div>
+                                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
                                         <label for="{{schedule_form.classification.id_for_label}}">{{schedule_form.classification.label}}</label><br />
                                         {% render_field schedule_form.classification class+="form-control" %}
+                                        {% if schedule_form.classification.errors %}
+                                            {%  for error in schedule_form.classification.errors %}
+                                                 <li style="color:red"> {{ error }} </li>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
-                                    {% if schedule_form.classification.errors %}
-                                        {%  for error in schedule_form.classification.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    {% endif %}
-                                    <div class="md-form form-group {% if schedule_form.doses.errors %} has-errors {% endif %}">
-                                        <label for="{{schedule_form.doses.id_for_label}}">{{schedule_form.doses.label}}</label><br />
-                                        {% render_field schedule_form.doses class+="form-control" %}
-                                    </div>
-                                    {% if schedule_form.doses.errors %}
-                                        {%  for error in schedule_form.doses.errors %}
-                                            {{ error }}
-                                        {% endfor %}
-                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
@@ -142,6 +149,12 @@ $(document).ready(function(){
                 $label.show()
             }
         })  
+    })
+    $('input[type=number]').each(function(){
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        if ($(this).val() != "") {
+            $label.hide()
+        }
     })
     $("input").on('input', function() {
         var $label = $("label[for='"+$(this).attr('id')+"']");

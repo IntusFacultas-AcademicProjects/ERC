@@ -4,22 +4,41 @@ from records.views import horse_views, medicine_views, index_views
 
 app_name = "records"
 urlpatterns = [
+
+    # Index
     url(r'^$', index_views.index, name="index"),
     url(r'^all_events/$', index_views.all_events, name='all_events'),
     url(
-        r'^medicine/create/$',
-        medicine_views.CreateMedicine.as_view(),
-        name="create-medicine"
+        r'^print/today/$',
+        index_views.print_today,
+        name="print-today"
     ),
     url(
-        r'^medicine/(?P<pk>[0-9]+)/create-schedules/$',
-        medicine_views.CreateSchedule.as_view(),
-        name="add-schedules"
+        r'^search/$',
+        index_views.SearchList.as_view(),
+        name="search"
     ),
+
+    # Horses
     url(
         r'^horse/(?P<pk>[0-9]+)/add-medicine/$',
         medicine_views.AddMedicine.as_view(),
         name="apply-medicine"
+    ),
+    url(
+        r'^horse/(?P<pk>[0-9]+)/history/$',
+        medicine_views.MedicalHistory.as_view(),
+        name="medical-history"
+    ),
+    url(
+        r'^horse/(?P<pk>[0-9]+)/sell/$',
+        horse_views.sell_horse,
+        name="sell-horse"
+    ),
+    url(
+        r'^horse/(?P<pk>[0-9]+)/sell/cancel/$',
+        horse_views.cancel_sell_horse,
+        name="cancel-sell-horse"
     ),
     url(
         r'^horse/(?P<pk>[0-9]+)/temporary-medicine/(?P<med>[0-9]+)/$',
@@ -37,7 +56,12 @@ urlpatterns = [
         name="horse-list"
     ),
     url(
-        r'^horse/(?P<pk>[0-9]+)/review/$',
+        r'^horse/list/sold/$',
+        horse_views.SoldHorseList.as_view(),
+        name="sold-horse-list"
+    ),
+    url(
+        r'^horse/(?P<pk>[0-9]+)/$',
         horse_views.HorseView.as_view(),
         name="review-horse"
     ),
@@ -47,14 +71,33 @@ urlpatterns = [
         name="delete-horse"
     ),
     url(
-        r'^medicine/(?P<pk>[0-9]+)/delete/$',
-        medicine_views.delete_medicine,
-        name="delete-medicine"
-    ),
-    url(
         r'^horse/(?P<pk>[0-9]+)/temporary-medicine/(?P<med>[0-9]+)/delete/$',
         medicine_views.delete_temp_medicine,
         name="delete-temp-medicine"
+    ),
+        url(
+        r'^horse/(?P<pk>[0-9]+)/event/(?P<cpk>[0-9]+)/delete$',
+        medicine_views.delete_medical_event,
+        name="delete-medical-event"
+    ),
+
+
+
+    # Medicines
+    url(
+        r'^medicine/create/$',
+        medicine_views.CreateMedicine.as_view(),
+        name="create-medicine"
+    ),
+    url(
+        r'^medicine/(?P<pk>[0-9]+)/create-schedules/$',
+        medicine_views.CreateSchedule.as_view(),
+        name="add-schedules"
+    ),
+    url(
+        r'^medicine/(?P<pk>[0-9]+)/delete/$',
+        medicine_views.delete_medicine,
+        name="delete-medicine"
     ),
     url(
         r'^medicine/list/$',
@@ -66,9 +109,4 @@ urlpatterns = [
         medicine_views.MedicineView.as_view(),
         name="review-medicine"
     ),
-    url(
-        r'^search/$',
-        index_views.SearchList.as_view(),
-        name="search"
-    )
 ]

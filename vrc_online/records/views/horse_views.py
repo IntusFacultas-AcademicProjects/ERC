@@ -11,16 +11,22 @@ from django.contrib import messages
 from records.forms import HorseForm, TemporaryMedicineForm
 from records.models import Medicine, Horse
 from records.utils import remove_temporary_medicines, update_event, \
-    delete_event, create_event, create_birth_event
+    delete_event, create_event, create_birth_event, create_temp_event
 
 
-class HorseList(View):
-
+class SoldHorseList(View):
     def get(self, request):
         """
         Filters based on parameters passed through the URL
         """
+        message = 'This is where you can review your sold horses. Click ' + \
+            '"Review"' + \
+            ' on any entry to edit their biological information and ' + \
+            ' medical' + \
+            ' plans. Click "Delete" on the right to delete that horse.'
+        sold_list = True
         horses = Horse.objects.all()
+        horses = horses.filter(sold=True)
         parameters = request.GET.copy()
         parameters = {k: v for k, v in parameters.items() if v}
         keyword = parameters.get("keyword", None)
@@ -124,8 +130,149 @@ class HorseList(View):
                 "start": start,
                 "end": end,
                 "age_class": age_class,
+                "message": message,
+                "sold_list": sold_list
             }
         )
+
+
+class HorseList(View):
+
+    def get(self, request):
+        """
+        Filters based on parameters passed through the URL
+        """
+        sold_list = False
+        message = 'This is where you can review your horses. Click ' + \
+            '"Review"' + \
+            ' on any entry to edit their biological information and ' + \
+            ' medical' + \
+            ' plans. Click "Delete" on the right to delete that horse.'
+        horses = Horse.objects.all()
+        horses = horses.filter(sold=False)
+        parameters = request.GET.copy()
+        parameters = {k: v for k, v in parameters.items() if v}
+        keyword = parameters.get("keyword", None)
+        weight_lower = parameters.get("weight_lower", None)
+        weight_upper = parameters.get("weight_upper", None)
+        gender = parameters.get("gender", None)
+        pregnant = parameters.get("pregnant", None)
+        upper_age = parameters.get("lower_age", None)
+        lower_age = parameters.get("upper_age", None)
+        age_class = parameters.get("age_class", None)
+        start = parameters.get("start", None)
+        end = parameters.get("end", None)
+        if keyword is not None:
+            horses = horses.filter(Q(name__icontains=keyword) |
+                                   Q(notes__icontains=keyword))
+        if weight_lower is not None:
+            if weight_upper is not None:
+                horses = horses.filter(
+                    weight__range=[int(weight_lower), int(weight_upper)])
+            else:
+                horses = horses.filter(
+                    weight__gte=int(weight_lower))
+        elif weight_upper is not None:
+            horses = horses.filter(weight__lte=int(weight_upper))
+        if gender is not None:
+            if gender != "":
+                horses = horses.filter(gender=gender)
+        if pregnant is not None:
+            if pregnant != "":
+                horses = horses.filter(pregnant=pregnant)
+        if lower_age is not None:
+            if upper_age is not None:
+                if int(age_class) == 0:
+                    date_lower = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(lower_age))
+                    date_upper = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(upper_age))
+                    horses = horses.filter(dob__range=[date_lower, date_upper])
+                else:
+                    date_lower = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(lower_age) * 12)
+                    date_upper = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(upper_age) * 12)
+                    horses = horses.filter(dob__range=[date_lower, date_upper])
+            else:
+                if int(age_class) == 0:
+                    date_lower = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(lower_age))
+                    horses = horses.filter(dob__gte=date_lower)
+                else:
+                    date_lower = datetime.datetime.today().date() - \
+                        relativedelta.relativedelta(months=int(lower_age) * 12)
+                    horses = horses.filter(dob__gte=date_lower)
+        elif upper_age is not None:
+            if int(age_class) == 0:
+                date_upper = datetime.datetime.today().date() - \
+                    relativedelta.relativedelta(months=int(upper_age))
+                horses = horses.filter(dob__lte=date_upper)
+            else:
+                date_upper = datetime.datetime.today().date() - \
+                    relativedelta.relativedelta(months=int(upper_age) * 12)
+                horses = horses.filter(dob__lte=date_upper)
+        if start is not None:
+            start = datetime.datetime.strptime(start, '%m/%d/%Y').date()
+            if end is not None:
+                end = datetime.datetime.strptime(end, '%m/%d/%Y').date()
+                horses = horses.filter(dob__range=[start, end])
+            else:
+                horses = horses.filter(dob__gte=start)
+        elif end is not None:
+            end = datetime.datetime.strptime(end, '%m/%d/%Y').date()
+            horses = horses.filter(dob__lte=end)
+        """
+        Age as a number is not a real field in the database.
+        It is calculated here
+        """
+        years = {}
+        months = {}
+        for horse in horses:
+            years[horse.id] = int(horse.age / 12)
+            months[horse.id] = horse.age % 12
+        if start is not None:
+            start = start.strftime("%m/%d/%Y")
+        if end is not None:
+            end = end.strftime("%m/%d/%Y")
+        return render(
+            request,
+            'records/horse_list.html',
+            {
+                "horses": horses,
+                "years": years,
+                "months": months,
+                "keyword": keyword,
+                "weight_lower": weight_lower,
+                "weight_upper": weight_upper,
+                "gender": gender,
+                "pregnant": pregnant,
+                "upper_age": lower_age,
+                "lower_age": upper_age,
+                "age_class": age_class,
+                "start": start,
+                "end": end,
+                "age_class": age_class,
+                "message": message,
+                "sold_list": sold_list,
+            }
+        )
+
+
+def sell_horse(request, pk):
+    horse = Horse.objects.get(pk=pk)
+    horse.sold = False
+    horse.sale_price = 0
+    horse.save()
+    return HttpResponseRedirect(reverse_lazy("records:sold-horse-list"))
+
+
+def cancel_sell_horse(request, pk):
+    horse = Horse.objects.get(pk=pk)
+    horse.sold = True
+    horse.sale_price = request.POST.get("price")
+    horse.save()
+    return HttpResponseRedirect(reverse_lazy("records:horse-list"))
 
 
 class HorseView(View):
@@ -200,7 +347,7 @@ class HorseView(View):
             year = dob[6:]
             month = dob[0:2]
             day = dob[3:5]
-            date = datetime.datetime.date(int(year), int(month), int(day))
+            date = datetime.date(int(year), int(month), int(day))
             today = date.today()
             parameters['age'] = self.monthdelta(date, today)
             form = HorseForm(parameters)
@@ -239,7 +386,15 @@ class HorseView(View):
             horse.update(notes=parameters.get("notes"))
             horse.update(gender=parameters.get("gender"))
             horse.update(pregnant=parameters.get("pregnant"))
+            datest = None
+            if parameters.get("date_of_impregnation", None) is not None and \
+                    parameters.get("date_of_impregnation", None) != "":
+                datest = datetime.datetime.strptime(
+                    parameters.get("date_of_impregnation"), "%m/%d/%Y")
+            horse.update(date_of_impregnation=datest)
             messages.success(request, "Horse successfully updated.")
+            horse = Horse.objects.get(pk=pk)
+            horse.refresh_from_db()
             update_event(horse=horse)
             return HttpResponseRedirect(
                 reverse_lazy('records:review-horse', kwargs={"pk": pk})
@@ -269,6 +424,7 @@ class HorseView(View):
         elif parameters.get("_method") == "EDIT_TEMPS":
             del parameters['_method']
             horse = Horse.objects.get(pk=pk)
+            print(parameters)
             temp_med_form = TemporaryMedicineForm(parameters)
             if temp_med_form.is_valid():
                 print("this should exist")
@@ -278,7 +434,7 @@ class HorseView(View):
                 print(medicine)
                 medicine.horse = horse
                 medicine.save()
-                create_event(horse=horse, medicine=medicine)
+                create_temp_event(horse=horse, medicine=medicine)
                 messages.success(
                     request,
                     "Temporary medicine successfully added."
@@ -357,7 +513,7 @@ class CreateHorse(View):
             )
         horse = form.save()
         messages.success(request, "Horse successfully created.")
-        create_birth_event(horse)
+        create_birth_event(horse, horse.dob)
         return HttpResponseRedirect(
             reverse_lazy('records:apply-medicine', kwargs={'pk': horse.id})
         )

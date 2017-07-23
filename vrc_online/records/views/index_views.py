@@ -1,5 +1,5 @@
 from itertools import chain
-from datetime import datetime, date
+from datetime import date
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q
@@ -14,16 +14,23 @@ OPTIONS = """{  timeFormat: "H:mm",
                     center: 'title',
                     right: 'month,agendaWeek,agendaDay',
                 },
-                allDaySlot: false,
+                allDaySlot: true,
                 firstDay: 0,
                 weekMode: 'liquid',
                 slotMinutes: 15,
                 defaultEventMinutes: 30,
                 minTime: 0,
                 maxTime: 24,
-                height: 600,
-                editable: true,
                 eventLimit: true,
+                views: {
+                     month: {
+                       eventLimit: 3
+                     }
+                },
+                height: 600,
+                editable: false,
+                eventLimit: true,
+                eventLimitText: "More",
                 dayClick: function(date, allDay, jsEvent, view) {
                     if (allDay) {
                         $('#calendar').fullCalendar('gotoDate', date)
@@ -39,6 +46,20 @@ OPTIONS = """{  timeFormat: "H:mm",
             }"""
 
 
+def print_today(request):
+    today_events = CalendarEvent.objects.filter(
+        start=date.today()).exclude(title__icontains="born")
+    today = date.today()
+    return render(
+        request,
+        'records/printable.html',
+        {
+            'events': today_events,
+            'today': today,
+        }
+    )
+
+
 def index(request):
     """
     Uses Django port for fullcalendar. Landing page with calendar, actions and
@@ -47,12 +68,15 @@ def index(request):
     """
     event_url = 'all_events/'
     today = date.today()
+    today_events = CalendarEvent.objects.filter(
+        start=date.today()).exclude(title__icontains="born")
     return render(
         request,
         'records/index.html',
         {
             'calendar_config_options': calendar_options(event_url, OPTIONS),
             "today": today,
+            "today_events": today_events,
         }
     )
 
@@ -72,6 +96,7 @@ class SearchList(View):
 
     def get(self, request):
         search_term = request.GET.get("search", None)
+        print("search: " + search_term)
         horses = Horse.objects.none()
         medicines = Medicine.objects.none()
         if (search_term is not None and search_term.find(" ") > -1):
@@ -85,10 +110,15 @@ class SearchList(View):
                     Q(name__icontains=keyword) | Q(notes__icontains=keyword))
                 medicines = list(chain(medicines, add))
         elif search_term is not None:
-            horses = horses.filter(Q(name__icontains=search_term) |
-                                   Q(notes__icontains=search_term))
-            medicines = medicines.filter(Q(name__icontains=search_term) |
-                                         Q(notes__icontains=search_term))
+            horses = Horse.objects.filter(
+                Q(name__icontains=search_term) |
+                Q(notes__icontains=search_term)
+            )
+            medicines = Medicine.objects.filter(
+                Q(name__icontains=search_term) |
+                Q(notes__icontains=search_term)
+            )
+        print(horses)
         distinct_horses = {}
         horse_keys = []
         distinct_medicines = {}

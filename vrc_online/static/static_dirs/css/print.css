@@ -1,0 +1,11 @@
+.printButtonClass{ display : none !important }
+
+.printButtonClass * {
+     display : none !important 
+}
+
+h3::first-letter {
+    /*Hacky solution to a Chrome bug that shifts the first letter of a header down*/
+    margin: 0;
+    padding: 0;
+}

@@ -43,6 +43,14 @@ class Horse(models.Model):
         default=NOT_PREGNANT,
         choices=PREGNANCY_CHOICES
     )
+    sold = models.BooleanField("Sold", default=False)
+    sale_price = models.IntegerField("Sale Price", blank=True, null=True)
+
+    def save(self, force_insert=False, force_update=False):
+        is_new = self.id is None
+        super(Horse, self).save(force_insert, force_update)
+        if is_new:
+            MedicalHistory.objects.create(horse=self)
 
     def __str__(self):
         gender = "Mare" if self.gender else "Stallion"
@@ -71,9 +79,9 @@ class Medicine(models.Model):
         (WEEKS, "Weeks"),
         (MONTHS, "Months"),
         (YEARS, "Years"),
-        (ALL, "All"),
     )
     DEMOGRAPHIC_CHOICES = (
+        (ALL, "All"),
         (FOALS, "Foals"),
         (ADULTS, "Adults"),
         (PREGNANT, "Pregnant Mares"),
@@ -159,9 +167,9 @@ class Schedule(models.Model):
         (WEEKS, "Weeks"),
         (MONTHS, "Months"),
         (YEARS, "Years"),
-        (ALL, "All"),
     )
     DEMOGRAPHIC_CHOICES = (
+        (ALL, "All"),
         (FOALS, "Foals"),
         (ADULTS, "Adults"),
         (PREGNANT, "Pregnant Mares"),
@@ -180,11 +188,29 @@ class Schedule(models.Model):
     )
 
     def __str__(self):
-        return "Medicine: {} | Doses: {} | Frequency: {} | " \
-            + "Interval: {} | Classification: {}".format(
-                self.medicine.name,
-                self.doses,
-                self.frequency,
-                self.interval,
-                self.classification
-            )
+        msg = "Medicine: {} | Doses: {} | Frequency: {} | Interval: {} | Classification: {}".format(self.medicine.name,
+                                                                                                    self.doses,
+                                                                                                    self.frequency,
+                                                                                                    self.interval,
+                                                                                                    self.classification
+                                                                                                    )
+        return msg
+
+
+class MedicalHistory(models.Model):
+    horse = models.OneToOneField(
+        Horse,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        related_name="history"
+    )
+
+
+class MedicalEvent(models.Model):
+    """
+    Generated for all vaccines that have passed date and for manual adding
+    """
+    msg = models.TextField("Details", max_length=256)
+    date = models.DateField()
+    history = models.ForeignKey(
+        MedicalHistory, on_delete=models.CASCADE, related_name="events")

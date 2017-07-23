@@ -13,10 +13,10 @@
                     </div>
                 </div>
             </div>
-    <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+    <div class="row"  style="margin-bottom: 15px;">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
             <div class="row">
-                <div class="card text-center">
+                <div class="card text-center" style="margin-top: 15px;">
                     <h3 class="card-header default-color-dark white-text">
                         Horse Information.
                     </h3>
@@ -94,8 +94,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                <div class="card text-center">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                <div class="card text-center"  style="margin-top: 15px;">
                     <h3 class="card-header default-color-dark white-text">
                         Apply Medicines, check all that apply.
                     </h3>
@@ -179,6 +179,7 @@
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function() {
+        
         $(document).on("click", function() {
             $('input').each(function(){
                 var $label = $("label[for='"+$(this).attr('id')+"']");

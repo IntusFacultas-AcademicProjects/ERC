@@ -82,6 +82,24 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="md-form form-group {% if form.date_of_impregnation.errors %} has-errors {% endif %}">
+                                        <label for="{{form.date_of_impregnation.id_for_label}}">{{form.date_of_impregnation.label}}</label><br/>
+                                        <div class="input-group date" data-provide="datepicker">
+                                            {% render_field form.date_of_impregnation class+="form-control" %}
+                                            <div class="input-group-addon">
+                                                <i class="fa fa-calendar" aria-hidden="true"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% if form.date_of_impregnation.errors %}
+                                        {%  for error in form.date_of_impregnation.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                                     <div class="md-form form-group {% if form.notes.errors %} has-errors {% endif %}">
                                         <label for="{{form.notes.id_for_label}}">{{form.notes.label}}</label>
                                         {% render_field form.notes class+="md-textarea" %}
@@ -108,7 +126,7 @@
                 <h3 class="card-header default-color-dark white-text">
                     {{horse.name}}'s Current Medications
                 </h3>
-                    <div class="card-block" style="height:528px; overflow-y:scroll">
+                    <div class="card-block" style="height:588px; overflow-y:scroll">
                     <form class="form" action="" method="post">
                     <input type="hidden" name="_method" value="DELETE_MEDICINE"> 
                         {% csrf_token %}
@@ -191,8 +209,17 @@
                     </div>
                     <div class="card-footer text-muted default-color-dark white-text">
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/>
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#tempMedicine">Temporary Medicines</button>
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#tempMedicine">Temporary Medicines</button>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <input type="submit" value="Submit" class="btn btn-primary"/>
+                                </div>
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <a href="{% url 'records:medical-history' pk=horse.id %}" class="btn btn-info">Medical History</a>
+                                </div>
+                            </div>
                         </div>
                     </div>  
                 </form>
@@ -322,7 +349,7 @@
                                     <td>{{medicine.doses}} dose(s), 1 every {{medicine.frequency}} {{medicine.get_interval_display}} for {{medicine.get_classification_display}}</td>
                                     <td>
                                         <form class="form" action="{% url 'records:delete-temp-medicine' pk=horse.id med=medicine.id %}">
-                                            <button type="submit" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                            <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -337,25 +364,25 @@
                     <div class="panel panel-default">
                         <h4>New Temporary Medicine</h4>
                         <div class="panel-body">
-                                <div class="md-form {% if temp_med_form.name.errors %} has-errors {% endif %}">
-                                    <label for="{{temp_med_form.name.id_for_label}}">{{temp_med_form.name.label}}</label>
-                                    {% render_field temp_med_form.name class+="temp_med_form-control" %}
-                                </div>
+                            <div class="md-form {% if temp_med_form.name.errors %} has-errors {% endif %}">
+                                <label for="{{temp_med_form.name.id_for_label}}">{{temp_med_form.name.label}}</label>
+                                {% render_field temp_med_form.name class+="temp_med_form-control" %}
                                 {% if temp_med_form.name.errors %}
                                     {%  for error in temp_med_form.name.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 {% endif %}
-                                <div class="md-form form-group {% if temp_med_form.notes.errors %} has-errors {% endif %}">
-                                    <label for="{{temp_med_form.notes.id_for_label}}">{{temp_med_form.notes.label}}</label>
-                                    {% render_field temp_med_form.notes class+="md-textarea" %}
-                                </div>
+                            </div>
+                            <div class="md-form form-group {% if temp_med_form.notes.errors %} has-errors {% endif %}">
+                                <label for="{{temp_med_form.notes.id_for_label}}">{{temp_med_form.notes.label}}</label>
+                                {% render_field temp_med_form.notes class+="md-textarea" %}
                                 {% if temp_med_form.notes.errors %}
                                     {%  for error in temp_med_form.notes.errors %}
                                         {{ error }}
                                     {% endfor %}
                                 {% endif %}
-                                <div class="md-form form-group {% if temp_med_form.date_to_start.errors %} has-errors {% endif %}">
+                            </div>
+                            <div class="md-form form-group {% if temp_med_form.date_to_start.errors %} has-errors {% endif %}">
                                     <label for="{{temp_med_form.date_to_start.id_for_label}}" style="padding-left:15px">{{temp_med_form.date_to_start.label}}</label><br/>
                                     <div class="input-group date" data-provide="datepicker">
                                         {% render_field temp_med_form.date_to_start class+="temp_med_form-control" attr="required" %}
@@ -369,44 +396,54 @@
                                         {% endfor %}
                                     {% endif %}
                                 </div>
-                                <div class="row md-form form-group {% if temp_med_form.frequency.errors %} has-errors {% endif %}">
-                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                        <label for="{{temp_med_form.frequency.id_for_label}}">{{temp_med_form.frequency.label}}</label><br />
-                                        {% render_field temp_med_form.frequency class+="form-control" attr="required" %}
-                                    </div>
-                                </div>
-                                {% if temp_med_form.frequency.errors %}
-                                    {%  for error in temp_med_form.frequency.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="md-form form-group {% if temp_med_form.interval.errors %} has-errors {% endif %}">  
-                                    <label for="{{temp_med_form.interval.id_for_label}}">{{temp_med_form.interval.label}}</label><br />
-                                    {% render_field temp_med_form.interval class+="form-control" attr="required" %}
-                                </div>
-                                {% if temp_med_form.interval.errors %}
-                                    {% for error in temp_med_form.interval.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="md-form form-group {% if temp_med_form.classification.errors %} has-errors {% endif %}">
-                                    <label for="{{temp_med_form.classification.id_for_label}}">{{temp_med_form.classification.label}}</label><br />
-                                    {% render_field temp_med_form.classification class+="form-control" attr="required" %}
-                                </div>
-                                {% if temp_med_form.classification.errors %}
-                                    {%  for error in temp_med_form.classification.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                {% endif %}
-                                <div class="md-form form-group {% if temp_med_form.doses.errors %} has-errors {% endif %}">
-                                    <label for="{{temp_med_form.doses.id_for_label}}">{{temp_med_form.doses.label}}</label><br />
+                            <div class="row md-form form-group {% if temp_med_form.doses.errors %} has-errors {% endif %}">
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                                    <label for="{{temp_med_form.doses.id_for_label}}">{{temp_med_form.doses.label}}</label>
                                     {% render_field temp_med_form.doses class+="form-control" %}
+                                    {% if temp_med_form.doses.errors %}
+                                        {%  for error in temp_med_form.doses.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
-                                {% if temp_med_form.doses.errors %}
-                                    {%  for error in temp_med_form.doses.errors %}
-                                        {{ error }} 
-                                    {% endfor %}
-                                {% endif %}
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <p style="margin-top:15px">doses, 1 every</p>
+                                </div>
+                            </div>
+                            <div class="row md-form form-group {% if temp_med_form.frequency.errors %} has-errors {% endif %}">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{temp_med_form.frequency.id_for_label}}">{{temp_med_form.frequency.label}}</label>
+                                    {% render_field temp_med_form.frequency class+="form-control" %}
+                                    {% if temp_med_form.frequency.errors %}
+                                        {%  for error in temp_med_form.frequency.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                    <label for="{{temp_med_form.interval.id_for_label}}">{{temp_med_form.interval.label}}</label><br />
+                                    {% render_field temp_med_form.interval class+="form-control" %}
+                                    {% if temp_med_form.interval.errors %}
+                                        {% for error in temp_med_form.interval.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row md-form form-group {% if temp_med_form.classification.errors %} has-errors {% endif %}">
+                                <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                                    <p style="margin-top:15px">for </p>
+                                </div>
+                                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+                                    <label for="{{temp_med_form.classification.id_for_label}}">{{temp_med_form.classification.label}}</label><br />
+                                    {% render_field temp_med_form.classification class+="form-control" %}
+                                    {% if temp_med_form.classification.errors %}
+                                        {%  for error in temp_med_form.classification.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -464,14 +501,17 @@ $(document).ready(function(){
     if ($("#id_gender").val() == 0) {
         $("#id_pregnant").val("0")
         $("#id_pregnant").prop( "disabled", true );
+        $("#id_date_of_impregnation").prop("disabled", true)
     }
     $("#id_gender").change(function() {
         if ($(this).val() == 0) {
             $("#id_pregnant").val("0")
             $("#id_pregnant").prop( "disabled", true );
+            $("#id_date_of_impregnation").prop("disabled", true)
         }
         else {
-            $("#id_pregnant").prop( "disabled", false );   
+            $("#id_pregnant").prop( "disabled", false );
+            $("#id_date_of_impregnation").prop("disabled", false)   
         }
     })
     $("#id_pregnant").change(function() {

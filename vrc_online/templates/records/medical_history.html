@@ -1,0 +1,94 @@
+{% extends 'records/base.html' %}
+{% load fullcalendar_tags %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
+            <table id="history" class="table" style="margin-top:15px">
+                <thead>
+                    <tr>
+                        <th colspan="3" style="text-align: center"> <h3>{{horse.name}}'s History</h3></th>
+                    </tr>
+                    <tr>
+                        <th>
+                            Date
+                        </th>
+                        <th>
+                            Event
+                        </th>
+                        <th>
+                            <button id="printButton" class="btn btn-primary printButtonClass">Print</button>
+                        </th>
+                        <th>
+                            <a href="{% url 'records:review-horse' pk=horse.id %}" class="btn btn-primary printButtonClass">Back to Horse Overview</a>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                        <tr>
+                            <td>{{event.date}}</td>
+                            <td colspan="2">{{event.msg}}</td>
+                            <td><a href="{% url 'records:delete-medical-event' pk=horse.id cpk=event.id %}" class="btn btn-danger btn-sm"><i class="fa fa-times printButtonClass" aria-hidden="true"></i></a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 printButtonClass">
+            <form class="form" action="{% url 'records:medical-history' pk=horse.id %}" method="POST">
+                {% csrf_token %}
+                 <div class="card text-center" style="margin-top:15px">
+                    <h3 class="card-header default-color-dark white-text">
+                        Add an event.
+                    </h3>
+                <div class="card-block">
+                    <div class="form-group">
+                        <div class="md-form {% if form.msg.errors %} has-errors {% endif %}">
+                            <label for="{{form.msg.id_for_label}}">{{form.msg.label}}</label><br class="br"/>
+                            {% render_field form.msg class+="md-textarea" %}
+                            {% if form.msg.errors %}
+                                {%  for error in form.msg.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="md-form {% if form.msg.errors %} has-errors {% endif %}">
+                            <label for="{{form.date.id_for_label}}" style="padding-left:15px">{{form.date.label}}</label><br/>
+                            <div class="input-group date" data-provide="datepicker">
+                                {% render_field form.date class+="form-control" %}
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                </div>
+                            </div>
+                            {% if form.dob.errors %}
+                                {%  for error in form.dob.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted default-color-dark white-text">
+                    <div class="form-group">
+                        <input type="submit" value="Submit" class="btn btn-primary"/> 
+                    </div>
+                </div>  
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+    $(function() {
+        $("#printButton").on("click", function() {
+            print($("#history"))       
+            
+        })
+    })
+</script>
+{% endblock js %}
