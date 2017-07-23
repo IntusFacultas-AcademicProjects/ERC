@@ -12,6 +12,34 @@ class MedicineForm(forms.ModelForm):
         fields = ('name', 'notes',)
 
 
+class TemporaryMedicineForm(forms.ModelForm):
+
+    class Meta:
+        model = Medicine
+        fields = ('name',
+                  'notes',
+                  'date_to_start',
+                  'frequency',
+                  'interval',
+                  'doses',
+                  'classification',
+                  )
+
+    def __init__(self, *args, **kwargs):
+        # first call parent's constructor
+        super(TemporaryMedicineForm, self).__init__(*args, **kwargs)
+        # there's a `fields` property now
+        self.fields['date_to_start'].required = True
+        self.fields['frequency'].required = True
+        self.fields['interval'].required = True
+        self.fields['doses'].required = True
+        self.fields['classification'].required = True
+
+    def clean(self):
+        cleaned_data = super(TemporaryMedicineForm, self).clean()
+        return cleaned_data
+
+
 class HorseForm(forms.ModelForm):
     """
     Age is in months.

@@ -1,6 +1,6 @@
 {% extends 'records/base.html' %}
 {% load widget_tweaks %}
-
+{% load record_filters %}
 {% block content %}
 <div class="container-fluid" style="margin-top:15px;">
      <div class="row">
@@ -107,44 +107,53 @@
                         {% for medicine in medicines %}
                         <div class="panel panel-info">
                             <div class="form-group">
-                                <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
-                                    <span class="input-group-addon">
-                                        <input type="checkbox" aria-label="..." id={{medicine.id}} name={{medicine.id}}>
-                                    </span>
-                                </div>
-                                <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <th>
-                                                       Name 
-                                                </th>
-                                                <td>
-                                                        {{medicine.name}}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <th>
-                                                       Notes 
-                                                </th>
-                                                <td>
-                                                        {{medicine.notes}}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                {% for schedule in schedules.medicine.id %}
-                                    <div class="row">
-                                        <div class="panel panel-info">
-                                            <div class="panel-body">
-                                                <p>
-                                                {{schedule.doses}} doses, 1 every {{schedule.frequency}} {{schedule.interval.1}}, for {{schedule.classification}}   
-                                                </p>
-                                            </div>
-                                        </div>
+                                <div class="row">
+                                    <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
+                                        <span class="input-group-addon">
+                                            <input type="checkbox" aria-label="..." id="{{medicine.id}}" name="{{medicine.id}}">
+                                        </span>
                                     </div>
-                                {% endfor%}
+                                    <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>
+                                                           Name 
+                                                    </th>
+                                                    <td>
+                                                            {{medicine.name}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th>
+                                                           Notes 
+                                                    </th>
+                                                    <td>
+                                                            {{medicine.notes}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th style="text-align: center;">Schedules</th>   
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for schedule in schedules|get_item:medicine.id %}
+                                            <tr>
+                                                <td style="text-align: center">
+                                                {{schedule.doses}} doses, 1 every {{schedule.frequency}} {{schedule.get_interval_display}}, for {{schedule.get_classification_display}} 
+                                                </td>  
+                                            </tr>
+                                        {% endfor%}
+                                    </tbody>
+                                </table>
+                                </div>
                             </div>
                         </div>
                         {% endfor %}
@@ -170,6 +179,14 @@
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function() {
+        $(document).on("click", function() {
+            $('input').each(function(){
+                var $label = $("label[for='"+$(this).attr('id')+"']");
+                if ($(this).val() == "") {
+                    $label.show()
+                }
+            })  
+        })
         $("input").on('input', function() {
             var $label = $("label[for='"+$(this).attr('id')+"']");
             $label.hide()

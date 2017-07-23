@@ -62,6 +62,14 @@
 {% block js %}
 <script type="text/javascript">
 	$(document).ready(function() {
+		$(document).on("click", function() {
+	        $('input').each(function(){
+	            var $label = $("label[for='"+$(this).attr('id')+"']");
+	            if ($(this).val() == "") {
+	                $label.show()
+	            }
+	        })  
+	    })
 		$("input").on('input', function() {
 	        var $label = $("label[for='"+$(this).attr('id')+"']");
 	        $label.hide()

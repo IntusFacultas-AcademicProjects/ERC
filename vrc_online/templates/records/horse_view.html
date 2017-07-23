@@ -7,7 +7,7 @@
         <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card-block">
                 <h4 class="card-title">What can I do here?</h4>
-                <p class="card-text">Here you can modify the medicine's information, along with add new schedules to the medication and edit/delete old schedules</p>
+                <p class="card-text">Here you can modify the horses's information, along with add new medicines to the horse and edit/delete old schedules</p>
             </div>
         </div>
     </div>
@@ -118,7 +118,7 @@
                                 <div class="form-group">
                                     <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
                                         <span class="input-group-addon">
-                                            <input type="checkbox" aria-label="..." id={{medicine.id}} name={{medicine.id}}>
+                                            <input type="checkbox" id="{{medicine.id}}" name="{{medicine.id}}">
                                         </span>
                                     </div>
                                     <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
@@ -191,7 +191,8 @@
                     </div>
                     <div class="card-footer text-muted default-color-dark white-text">
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            <input type="submit" value="Submit" class="btn btn-primary"/>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#tempMedicine">Temporary Medicines</button>
                         </div>
                     </div>  
                 </form>
@@ -214,7 +215,7 @@
                                 <div class="form-group">
                                     <div class='col-lg-1 col-md-1 col-sm-1 col-xs-1'>
                                         <span class="input-group-addon">
-                                            <input type="checkbox" aria-label="..." id={{medicine.id}} name={{medicine.id}}>
+                                            <input type="checkbox" aria-label="..." id="{{medicine.id}}" name="{{medicine.id}}">
                                         </span>
                                     </div>
                                     <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
@@ -294,11 +295,160 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="tempMedicine" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Temporary Medicines</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body" style="overflow-y: scroll; max-height:500px;">
+            <div class="row">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <table class="table table-hover">
+                        <thead>
+                            <th>&nbsp</th>
+                            <th>Name</th>
+                            <th>Date to Start</th>
+                            <th>Schedules</th>
+                            <th>&nbsp</th>
+                        </thead>
+                        <tbody>
+                            {% for medicine in temp_meds %}
+                                <tr>
+                                    <td><a class="btn btn-primary btn-sm" href="{% url 'records:edit-temporary-medicine' pk=horse.id med=medicine.id %}">Review</a></td>
+                                    <td>{{medicine.name}}</td>
+                                    <td>{{medicine.date_to_start}}</td>
+                                    <td>{{medicine.doses}} dose(s), 1 every {{medicine.frequency}} {{medicine.get_interval_display}} for {{medicine.get_classification_display}}</td>
+                                    <td>
+                                        <form class="form" action="{% url 'records:delete-temp-medicine' pk=horse.id med=medicine.id %}">
+                                            <button type="submit" class="btn btn-danger btn-sm submitter" >Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                    <form class="form" action="" method="post">
+                    <input type="hidden" name="_method" value="EDIT_TEMPS"> 
+                    {% csrf_token %}
+                    <div class="panel panel-default">
+                        <h4>New Temporary Medicine</h4>
+                        <div class="panel-body">
+                                <div class="md-form {% if temp_med_form.name.errors %} has-errors {% endif %}">
+                                    <label for="{{temp_med_form.name.id_for_label}}">{{temp_med_form.name.label}}</label>
+                                    {% render_field temp_med_form.name class+="temp_med_form-control" %}
+                                </div>
+                                {% if temp_med_form.name.errors %}
+                                    {%  for error in temp_med_form.name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="md-form form-group {% if temp_med_form.notes.errors %} has-errors {% endif %}">
+                                    <label for="{{temp_med_form.notes.id_for_label}}">{{temp_med_form.notes.label}}</label>
+                                    {% render_field temp_med_form.notes class+="md-textarea" %}
+                                </div>
+                                {% if temp_med_form.notes.errors %}
+                                    {%  for error in temp_med_form.notes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="md-form form-group {% if temp_med_form.date_to_start.errors %} has-errors {% endif %}">
+                                    <label for="{{temp_med_form.date_to_start.id_for_label}}" style="padding-left:15px">{{temp_med_form.date_to_start.label}}</label><br/>
+                                    <div class="input-group date" data-provide="datepicker">
+                                        {% render_field temp_med_form.date_to_start class+="temp_med_form-control" attr="required" %}
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                    {% if temp_med_form.date_to_start.errors %}
+                                        {%  for error in temp_med_form.date_to_start.errors %}
+                                             <li style="color:red"> {{ error }} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="row md-form form-group {% if temp_med_form.frequency.errors %} has-errors {% endif %}">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label for="{{temp_med_form.frequency.id_for_label}}">{{temp_med_form.frequency.label}}</label><br />
+                                        {% render_field temp_med_form.frequency class+="form-control" attr="required" %}
+                                    </div>
+                                </div>
+                                {% if temp_med_form.frequency.errors %}
+                                    {%  for error in temp_med_form.frequency.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="md-form form-group {% if temp_med_form.interval.errors %} has-errors {% endif %}">  
+                                    <label for="{{temp_med_form.interval.id_for_label}}">{{temp_med_form.interval.label}}</label><br />
+                                    {% render_field temp_med_form.interval class+="form-control" attr="required" %}
+                                </div>
+                                {% if temp_med_form.interval.errors %}
+                                    {% for error in temp_med_form.interval.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="md-form form-group {% if temp_med_form.classification.errors %} has-errors {% endif %}">
+                                    <label for="{{temp_med_form.classification.id_for_label}}">{{temp_med_form.classification.label}}</label><br />
+                                    {% render_field temp_med_form.classification class+="form-control" attr="required" %}
+                                </div>
+                                {% if temp_med_form.classification.errors %}
+                                    {%  for error in temp_med_form.classification.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                {% endif %}
+                                <div class="md-form form-group {% if temp_med_form.doses.errors %} has-errors {% endif %}">
+                                    <label for="{{temp_med_form.doses.id_for_label}}">{{temp_med_form.doses.label}}</label><br />
+                                    {% render_field temp_med_form.doses class+="form-control" %}
+                                </div>
+                                {% if temp_med_form.doses.errors %}
+                                    {%  for error in temp_med_form.doses.errors %}
+                                        {{ error }} 
+                                    {% endfor %}
+                                {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <input type="submit" value="Submit" type="Submit" class="btn btn-primary"/>
+      </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock content %}
 
 {% block js %}
 <script type="text/javascript">
 $(document).ready(function(){
+    $(document).on("click", function() {
+        $('input').each(function(){
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() == "") {
+                $label.show()
+            }
+        })  
+    })
+    $('#tempMedicine :input').each(function(){
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        if ($(this).val() != "") {
+            $label.hide()
+        }
+    })  
+    $("#tempMedicine :input").on('input', function() {
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        $label.hide()
+    })
+    $("#tempMedicine :input").change(function() {
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        if ($(this).val() == "") {            
+            $label.show()
+        }
+    })
     $('.datepicker').datepicker({
          format: "yyyy-mm-dd",
          startDate: '-0d',
@@ -344,6 +494,25 @@ $(document).ready(function(){
             });
         }
     })
+    $(".submitter").click(function() {
+            $form =  $(this).closest("form")
+            $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'This action cannot be undone!',
+                buttons: {
+                    confirm: function () {
+                        $form.submit()
+                        
+                    },
+                    cancel: function () {
+                        
+                    },
+                }
+            });
+        })
    
 })
 </script>

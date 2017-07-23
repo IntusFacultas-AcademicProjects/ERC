@@ -135,6 +135,24 @@
 {% block js %}
 <script type="text/javascript">
 $(document).ready(function(){
+    $(document).on("click", function() {
+        $('input').each(function(){
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() == "") {
+                $label.show()
+            }
+        })  
+    })
+    $("input").on('input', function() {
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        $label.hide()
+    })
+    $("input").change(function() {
+        var $label = $("label[for='"+$(this).attr('id')+"']");
+        if ($(this).val() == "") {            
+        $label.show()
+        }
+    })
     $('.datepicker').datepicker({
          format: "yyyy-mm-dd",
          startDate: '-0d',

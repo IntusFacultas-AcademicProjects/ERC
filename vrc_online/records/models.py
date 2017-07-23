@@ -9,13 +9,17 @@ class Horse(models.Model):
     Optional fields:
         weight, notes
     """
+    STALLION = 0
+    MARE = 1
+    NOT_PREGNANT = 0
+    PREGNANT = 1
     GENDER_CHOICES = (
-        (0, "Stallion"),
-        (1, "Mare"),
+        (STALLION, "Stallion"),
+        (MARE, "Mare"),
     )
     PREGNANCY_CHOICES = (
-        (0, "Not Pregnant"),
-        (1, "Pregnant"),
+        (NOT_PREGNANT, "Not Pregnant"),
+        (PREGNANT, "Pregnant"),
     )
     age = models.PositiveIntegerField("Age", default=0)
     weight = models.PositiveIntegerField(
@@ -32,10 +36,11 @@ class Horse(models.Model):
     )
     name = models.CharField("Name", max_length=32)
     notes = models.TextField("Notes", max_length=256, blank=True, null=True)
-    gender = models.IntegerField("Gender", default=0, choices=GENDER_CHOICES)
+    gender = models.IntegerField(
+        "Gender", default=STALLION, choices=GENDER_CHOICES)
     pregnant = models.IntegerField(
         "Pregnant",
-        default=0,
+        default=NOT_PREGNANT,
         choices=PREGNANCY_CHOICES
     )
 
@@ -48,6 +53,52 @@ class Horse(models.Model):
             self.weight,
             self.age
         )
+
+
+class Medicine(models.Model):
+    """
+    A horse can have many medicines, and a medicine can be associated with many
+    horses. A medicine can have many schedules.
+    """
+    WEEKS = 0
+    MONTHS = 1
+    YEARS = 2
+    FOALS = 0
+    ADULTS = 1
+    PREGNANT = 2
+    ALL = 3
+    INTERVAL_CHOICES = (
+        (WEEKS, "Weeks"),
+        (MONTHS, "Months"),
+        (YEARS, "Years"),
+        (ALL, "All"),
+    )
+    DEMOGRAPHIC_CHOICES = (
+        (FOALS, "Foals"),
+        (ADULTS, "Adults"),
+        (PREGNANT, "Pregnant Mares"),
+    )
+
+    # Fields unique to temporary medicines
+    frequency = models.PositiveIntegerField("Frequency", blank=True, null=True)
+    interval = models.IntegerField(
+        "Interval", choices=INTERVAL_CHOICES, blank=True, null=True)
+    classification = models.PositiveIntegerField(
+        "Demographic",
+        choices=DEMOGRAPHIC_CHOICES, blank=True, null=True
+    )
+    doses = models.PositiveIntegerField("Doses", blank=True, null=True)
+    date_to_start = models.DateField(blank=True, null=True)
+
+    # Fields required for all medicines
+    name = models.CharField(max_length=32)
+    notes = models.TextField(max_length=256, blank=True, null=True)
+    horses = models.ManyToManyField(Horse)
+    horse = models.ForeignKey(
+        Horse, related_name="temporary_medicines", blank=True, null=True)
+
+    def __str__(self):
+        return "{} | {}".format(self.name, self.notes)
 
 
 class CalendarEvent(models.Model):
@@ -80,6 +131,9 @@ class CalendarEvent(models.Model):
         related_name="events",
         null=True,
     )
+    medicine = models.ForeignKey(
+        Medicine, on_delete=models.CASCADE, related_name="events",
+        blank=True, null=True)
 
     class Meta:
         verbose_name = _('Event')
@@ -89,33 +143,28 @@ class CalendarEvent(models.Model):
         return self.title
 
 
-class Medicine(models.Model):
-    """
-    A horse can have many medicines, and a medicine can be associated with many
-    horses. A medicine can have many schedules.
-    """
-    name = models.CharField(max_length=32)
-    notes = models.TextField(max_length=256, blank=True, null=True)
-    horses = models.ManyToManyField(Horse)
-
-    def __str__(self):
-        return "{} | {}".format(self.name, self.notes)
-
-
 class Schedule(models.Model):
     """
     A schedule will have a frequency and an interval (e.g. 2 weeks),
     and a number of doses (e.g. 2 doses separated by 2 weeks)
     """
+    WEEKS = 0
+    MONTHS = 1
+    YEARS = 2
+    FOALS = 0
+    ADULTS = 1
+    PREGNANT = 2
+    ALL = 3
     INTERVAL_CHOICES = (
-        (0, "Weeks"),
-        (1, "Months"),
-        (2, "Years"),
+        (WEEKS, "Weeks"),
+        (MONTHS, "Months"),
+        (YEARS, "Years"),
+        (ALL, "All"),
     )
     DEMOGRAPHIC_CHOICES = (
-        (0, "Foals"),
-        (1, "Adults"),
-        (2, "Pregnant Mares"),
+        (FOALS, "Foals"),
+        (ADULTS, "Adults"),
+        (PREGNANT, "Pregnant Mares"),
     )
     frequency = models.PositiveIntegerField("Frequency", default=0)
     interval = models.IntegerField("Interval", choices=INTERVAL_CHOICES)

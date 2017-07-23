@@ -135,6 +135,14 @@ $("input").change(function() {
         }
     })
 $(document).ready(function(){
+    $(document).on("click", function() {
+        $('input').each(function(){
+            var $label = $("label[for='"+$(this).attr('id')+"']");
+            if ($(this).val() == "") {
+                $label.show()
+            }
+        })  
+    })
     $('.datepicker input').datepicker({
          format: "yyyy-mm-dd",
          startDate: '-0d',
