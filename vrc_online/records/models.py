@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from farms.models import Farm
 
 
 class Horse(models.Model):
@@ -21,6 +22,7 @@ class Horse(models.Model):
         (NOT_PREGNANT, "Not Pregnant"),
         (PREGNANT, "Pregnant"),
     )
+
     age = models.PositiveIntegerField("Age", default=0)
     weight = models.PositiveIntegerField(
         "Weight",
@@ -45,6 +47,13 @@ class Horse(models.Model):
     )
     sold = models.BooleanField("Sold", default=False)
     sale_price = models.IntegerField("Sale Price", blank=True, null=True)
+    farm = models.ForeignKey(
+        Farm,
+        on_delete=models.CASCADE,
+        related_name="horses",
+        blank=True,
+        null=True
+    )
 
     def save(self, force_insert=False, force_update=False):
         is_new = self.id is None
@@ -97,13 +106,18 @@ class Medicine(models.Model):
     )
     doses = models.PositiveIntegerField("Doses", blank=True, null=True)
     date_to_start = models.DateField(blank=True, null=True)
+    horse = models.ForeignKey(
+        Horse,
+        on_delete=models.CASCADE,
+        related_name="temporary_medicines",
+        blank=True,
+        null=True
+    )
 
     # Fields required for all medicines
     name = models.CharField(max_length=32)
     notes = models.TextField(max_length=256, blank=True, null=True)
     horses = models.ManyToManyField(Horse)
-    horse = models.ForeignKey(
-        Horse, related_name="temporary_medicines", blank=True, null=True)
 
     def __str__(self):
         return "{} | {}".format(self.name, self.notes)

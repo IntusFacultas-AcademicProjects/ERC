@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'records',
     'fullcalendar',
     'widget_tweaks',
+    'farms'
 ]
 
 MIDDLEWARE = [
