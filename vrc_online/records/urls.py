@@ -6,7 +6,7 @@ app_name = "records"
 urlpatterns = [
 
     # Index
-    url(r'^$', index_views.index, name="index"),
+    url(r'^index$', index_views.index, name="index"),
     url(r'^all_events/$', index_views.all_events, name='all_events'),
     url(
         r'^print/today/$',

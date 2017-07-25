@@ -4,9 +4,11 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Q
 from django.views import View
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from fullcalendar.util import events_to_json, calendar_options
 from records.models import CalendarEvent, Horse, Medicine
-
+from farms.models import Farm
 
 OPTIONS = """{  timeFormat: "H:mm",
                 header: {
@@ -46,6 +48,7 @@ OPTIONS = """{  timeFormat: "H:mm",
             }"""
 
 
+@login_required
 def print_today(request):
     today_events = CalendarEvent.objects.filter(
         start=date.today()).exclude(title__icontains="born")
@@ -60,6 +63,7 @@ def print_today(request):
     )
 
 
+@login_required
 def index(request):
     """
     Uses Django port for fullcalendar. Landing page with calendar, actions and
@@ -81,6 +85,7 @@ def index(request):
     )
 
 
+@login_required
 def all_events(request):
     """
     JSON endpoint for all calendar events.
@@ -92,7 +97,7 @@ def all_events(request):
     )
 
 
-class SearchList(View):
+class SearchList(LoginRequiredMixin, View):
 
     def get(self, request):
         search_term = request.GET.get("search", None)
@@ -103,7 +108,9 @@ class SearchList(View):
             search_term = search_term.split()
             for keyword in search_term:
                 add = Horse.objects.filter(
-                    Q(name__icontains=keyword) | Q(notes__icontains=keyword))
+                    Q(name__icontains=keyword) | Q(notes__icontains=keyword) |
+                    Q(farm__name__icontains=keyword) |
+                    Q(farm__address__icontains=keyword))
                 horses = list(chain(horses, add))
             for keyword in search_term:
                 add = Medicine.objects.filter(

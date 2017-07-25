@@ -52,14 +52,18 @@ INSTALLED_APPS = [
     'records',
     'fullcalendar',
     'widget_tweaks',
-    'farms'
+    'farms',
+    'session'
 ]
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # During development only
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    # 'session.middleware.LoginRequiredMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -133,7 +137,12 @@ USE_L10N = True
 
 USE_TZ = True
 
+LOGIN_REDIRECT_URL = 'records:index'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-# os.path.join(PWD, 'static/')
+LOGIN_URL = 'login/'
+
+LOGIN_EXEMPT_URLS = (
+    r'^$',
+    r'^forgot$',
+    r'^register$',
+)

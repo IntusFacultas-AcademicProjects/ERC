@@ -1,0 +1,10 @@
+{% extends 'session/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+  <h2>Future Landing Page</h2>
+  <a class="btn btn-primary" href="{% url 'session:signup' %}">Create Account</a>
+  <a class="btn btn-primary" href="{% url 'session:login' %}">Login</a>
+  </form>
+{% endblock %}

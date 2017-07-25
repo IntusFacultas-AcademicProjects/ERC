@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from session.models import Profile
 
 
 class Farm(models.Model):
@@ -9,4 +9,7 @@ class Farm(models.Model):
     name = models.CharField("Name", max_length=32)
     address = models.TextField(
         "Address", max_length=256, blank=True, null=True)
-    user = models.ForeignKey(User)
+    profile = models.ForeignKey(Profile,
+                                on_delete=models.CASCADE,
+                                related_name="farms"
+                                )

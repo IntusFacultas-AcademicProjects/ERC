@@ -1,6 +1,9 @@
 from dateutil import relativedelta
 from calendar import monthrange
 import datetime
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.shortcuts import render
@@ -14,7 +17,8 @@ from records.utils import remove_temporary_medicines, update_event, \
     delete_event, create_event, create_birth_event, create_temp_event
 
 
-class SoldHorseList(View):
+class SoldHorseList(LoginRequiredMixin, View):
+
     def get(self, request):
         """
         Filters based on parameters passed through the URL
@@ -100,8 +104,9 @@ class SoldHorseList(View):
             end = datetime.datetime.strptime(end, '%m/%d/%Y').date()
             horses = horses.filter(dob__lte=end)
         """
-        Age as a number is not a real field in the database.
-        It is calculated here
+        Age as a year and month number is not a real field in the database.
+        It is calculated here based on the number of months which is stored
+        in the db
         """
         years = {}
         months = {}
@@ -136,7 +141,7 @@ class SoldHorseList(View):
         )
 
 
-class HorseList(View):
+class HorseList(LoginRequiredMixin, View):
 
     def get(self, request):
         """
@@ -259,15 +264,18 @@ class HorseList(View):
         )
 
 
-def sell_horse(request, pk):
+@login_required
+def cancel_sell_horse(request, pk):
     horse = Horse.objects.get(pk=pk)
     horse.sold = False
     horse.sale_price = 0
     horse.save()
+    print(horse.sold)
     return HttpResponseRedirect(reverse_lazy("records:sold-horse-list"))
 
 
-def cancel_sell_horse(request, pk):
+@login_required
+def sell_horse(request, pk):
     horse = Horse.objects.get(pk=pk)
     horse.sold = True
     horse.sale_price = request.POST.get("price")
@@ -275,7 +283,7 @@ def cancel_sell_horse(request, pk):
     return HttpResponseRedirect(reverse_lazy("records:horse-list"))
 
 
-class HorseView(View):
+class HorseView(LoginRequiredMixin, View):
 
     def monthdelta(self, d1, d2):
         delta = 0
@@ -473,7 +481,7 @@ class HorseView(View):
                               )
 
 
-class CreateHorse(View):
+class CreateHorse(LoginRequiredMixin, View):
     """
     Create Horse form, segues to medicine application
     Template: horse_form.html
@@ -529,6 +537,7 @@ class CreateHorse(View):
         )
 
 
+@login_required
 def delete_horse(request, pk):
     horse = Horse.objects.get(pk=pk)
     if horse:

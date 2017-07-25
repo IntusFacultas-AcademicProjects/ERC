@@ -4,6 +4,8 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 
 from records.forms import MedicineForm, ScheduleFormSet, \
@@ -13,7 +15,7 @@ from records.utils import create_event, delete_event, update_event,\
     update_history, delete_temp_event
 
 
-class MedicalHistory(View):
+class MedicalHistory(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         horse = Horse.objects.get(pk=pk)
@@ -55,6 +57,7 @@ class MedicalHistory(View):
             reverse_lazy("records:medical-history", kwargs={"pk": pk}))
 
 
+@login_required
 def delete_medical_event(request, pk, cpk):
     event = MedicalEvent.objects.get(pk=cpk)
     if event:
@@ -67,7 +70,7 @@ def delete_medical_event(request, pk, cpk):
                                              kwargs={"pk": pk}))
 
 
-class MedicineList(View):
+class MedicineList(LoginRequiredMixin, View):
 
     def get(self, request):
         medicines = Medicine.objects.all()
@@ -113,7 +116,7 @@ class MedicineList(View):
         )
 
 
-class MedicineView(View):
+class MedicineView(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         medicine = Medicine.objects.get(pk=pk)
@@ -181,7 +184,7 @@ class MedicineView(View):
                           )
 
 
-class CreateMedicine(View):
+class CreateMedicine(LoginRequiredMixin, View):
     """
     Create Medicine Form, segues to schedule creation form.
     Template: medicine_form.html
@@ -214,7 +217,7 @@ class CreateMedicine(View):
         )
 
 
-class CreateSchedule(View):
+class CreateSchedule(LoginRequiredMixin, View):
     """
     Create applications for a just-created medication.
     Template: schedule_form.html
@@ -262,6 +265,7 @@ class CreateSchedule(View):
         )
 
 
+@login_required
 def delete_medicine(request, pk):
     medicine = Medicine.objects.get(pk=pk)
     if medicine:
@@ -273,6 +277,7 @@ def delete_medicine(request, pk):
     return HttpResponseRedirect(reverse_lazy("records:medicine-list"))
 
 
+@login_required
 def delete_temp_medicine(request, pk, med):
     medicine = Medicine.objects.get(pk=med)
     if medicine:
@@ -288,7 +293,7 @@ def delete_temp_medicine(request, pk, med):
     )
 
 
-class AddTemporaryMedicine(View):
+class AddTemporaryMedicine(LoginRequiredMixin, View):
     """
     Updated temporary medicine that is not based
     on the date the horse is born.
@@ -332,7 +337,7 @@ class AddTemporaryMedicine(View):
         )
 
 
-class AddMedicine(View):
+class AddMedicine(LoginRequiredMixin, View):
     """
     Add medicine to a horse immediately following horse creation.
     Template: add_medicine.html

@@ -20,11 +20,15 @@
                             <tr>
                                 <th>&nbsp</th>
                                 <th>Name</th>
+                                <th>Farm</th>
                                 <th>Date of Birth</th>
                                 <th>Age</th>
                                 <th>Gender</th>
                                 <th>Weight</th>
                                 <th>Pregnancy Status</th>
+                                <th>Date of Impregnation</th>
+                                <th>Sale Price</th>
+                                <th>&nbsp</th>
                                 <th>&nbsp</th>
                             </tr>
                         </thead>
@@ -37,23 +41,40 @@
                                         <a class="btn btn-primary btn-sm" href="{% url 'records:review-horse' pk=horse.id %}">Review</a>
                                     </td>
                                     <td>{{horse.name}}</td>
+                                    <td>{% if horse.farm %} {{horse.farm}} {% endif %}</td>
                                     <td>{{horse.dob}}</td>
                                     <td>{{years|get_item:num}} Years {{months|get_item:num}} Months</td>
                                     <td>{{horse.get_gender_display}}</td>
                                     <td>{{horse.weight|default_if_none:"0"}} lbs</td>
                                     <td>{{horse.get_pregnant_display}}</td>
+                                    <td>{%if horse.date_of_impregnation %}{{horse.date_of_impregnation}} {% endif %}</td>
+                                    <td>{% if horse.sold %} ${{horse.sale_price}}{% endif %}</td>
                                     <td>
                                         <form class="form" action="{% url 'records:delete-horse' pk=horse.id %}">
                                             <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
                                         </form>
+                                    </td>
+                                    <td>
+                                        {% if horse.sold %}
+                                            <form class="form" id="formSale{{horse.id}}" action="{% url 'records:cancel-sell-horse' pk=horse.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn btn-info btn-sm canceller">Cancel Sale</button>
+                                            </form>
+                                        {% else %}
+                                            <form class="form" id="formSale{{horse.id}}" action="{% url 'records:sell-horse' pk=horse.id %}" method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" value="0" name="price">
+                                                <button type="button" class="btn btn-info btn-sm seller">Sell</button>
+                                            </form>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endwith %}
                             {% endfor %}
                             {% else %}
                                 <tr>
-                                    <td colspan="8" style="text-align:center">
-                                        No horses have been matched your query.
+                                    <td colspan="9" style="text-align:center">
+                                        No horses have been created yet.
                                     </td>
                                 </tr>
                             {% endif %}
@@ -132,6 +153,61 @@
 {% block js %}
 <script type="text/javascript">
 $(document).ready(function() {
+        $(".seller").click(function() {
+            var $form = $(this).closest(".form")
+            var name = "#"+$form.attr('id')+" :input"
+            var $price;
+            $(name).each(function() {
+                var $input = $(this)
+                if ($input.attr("name") != undefined && $input.attr("name").localeCompare("price") == 0) {
+                    $price = $(this)
+                }
+            })
+            $.confirm({
+                backgroundDismiss: false,
+                escpaeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: "Confirm sale",
+                content: "<form action='' class='form'><div class='form-group'><label for='value'>Sale Price</label><input type='number' class='value form-control' name='value' id='saleValue' required></div></form>",
+                buttons:{
+                    formSubmit: {
+                        text: "Submit",
+                        btnClass: 'btn-blue',
+                        action: function() {
+                            var value = this.$content.find('.value').val();
+                            if (!value) {
+                                $.alert('Please provide a sale price.')
+                                return false;
+                            }
+                            $price.val(value)
+                            $form.submit()
+                        }
+                    },
+                    cancel: function() {
+
+                    }
+                }
+            })
+        })
+        $(".canceller").click(function() {
+            $form =  $(this).closest("form")
+            $.confirm({
+                backgroundDismiss: false,
+                escapeKey: false,
+                backgroundDismissAnimation: 'shake',
+                title: 'Are you sure?',
+                content: 'This action will erase this horse\'s sale price and move the horse back to regular list!',
+                buttons: {
+                    confirm: function () {
+                        $form.submit()
+                        
+                    },
+                    cancel: function () {
+                        
+                    },
+                }
+            });
+        })
         $(".submitter").click(function() {
             $form =  $(this).closest("form")
             $.confirm({

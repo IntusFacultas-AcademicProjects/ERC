@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from farms.models import Farm
+from session.models import Profile
 
 
 class Horse(models.Model):
@@ -54,6 +55,10 @@ class Horse(models.Model):
         blank=True,
         null=True
     )
+    profile = models.ForeignKey(Profile,
+                                on_delete=models.CASCADE,
+                                related_name="horses"
+                                )
 
     def save(self, force_insert=False, force_update=False):
         is_new = self.id is None
@@ -113,7 +118,10 @@ class Medicine(models.Model):
         blank=True,
         null=True
     )
-
+    profile = models.ForeignKey(Profile,
+                                on_delete=models.CASCADE,
+                                related_name="medicines"
+                                )
     # Fields required for all medicines
     name = models.CharField(max_length=32)
     notes = models.TextField(max_length=256, blank=True, null=True)
@@ -156,6 +164,10 @@ class CalendarEvent(models.Model):
     medicine = models.ForeignKey(
         Medicine, on_delete=models.CASCADE, related_name="events",
         blank=True, null=True)
+    profile = models.ForeignKey(Profile,
+                                on_delete=models.CASCADE,
+                                related_name="events"
+                                )
 
     class Meta:
         verbose_name = _('Event')

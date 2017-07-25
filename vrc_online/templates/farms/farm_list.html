@@ -11,61 +11,33 @@
             </div>
         </div>
     </div>
-    {% include 'partials/filter.html' %}
-    <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+    <div class="row" style="margin-top:15px">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9">
             <table class="table table-hover">
-                <thead>
+                <thead style="background-color: #00695c!important; color: #FFF!important;">
                     <tr>
-                        <th>&nbsp</th>
                         <th>Name</th>
-                        <th>Farm</th>
-                        <th>Date of Birth</th>
-                        <th>Age</th>
-                        <th>Gender</th>
-                        <th>Weight</th>
-                        <th>Pregnancy Status</th>
-                        <th>Date of Impregnation</th>
-                        {% if sold_list %} <th>Sale Price</th> {% endif %}
-                        <th>&nbsp</th>
-                        <th>&nbsp</th>
+                        <th>Address</th>
+                        <th>Edit Horses</th>
+                        <th>
+                            <form class="form" action="" method="GET">
+                                <input name="keyword" id="keyword" class="in-green form-control" style="background-color:white !important; margin:0px; padding:0px" type="text" placeholder="Filter by Keyword">
+                            </form>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% if horses|length > 0 %}
-                    {% for horse in horses %}
-                        {% with horse.id as num %}
+                    {% if farms|length > 0 %}
+                    {% for farm in farms %}
+                        {% with farm.id as num %}
                         <tr>
+                            <td>{{farm.name}}</td>
+                            <td>{% if farm.addres %} {{farm.address}} {% endif %}</td>
+                            <td><a href="{% url 'farms:edit-farm' pk=farm.id" class="btn btn-info">Edit</a></td>
                             <td>
-                                <a class="btn btn-primary btn-sm" href="{% url 'records:review-horse' pk=horse.id %}">Review</a>
-                            </td>
-                            <td>{{horse.name}}</td>
-                            <td>{% if horse.farm %} {{horse.farm}} {% endif %}</td>
-                            <td>{{horse.dob}}</td>
-                            <td>{{years|get_item:num}} Years {{months|get_item:num}} Months</td>
-                            <td>{{horse.get_gender_display}}</td>
-                            <td>{{horse.weight|default_if_none:"0"}} lbs</td>
-                            <td>{{horse.get_pregnant_display}}</td>
-                            <td>{%if horse.date_of_impregnation %}{{horse.date_of_impregnation}} {% endif %}</td>
-                            {% if sold_list %} <td>${{horse.sale_price}}</td>{% endif %}
-                            <td>
-                                <form class="form" action="{% url 'records:delete-horse' pk=horse.id %}">
+                                <form class="form" action="{% url 'records:delete-farm' pk=farm.id %}">
                                     <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
                                 </form>
-                            </td>
-                            <td>
-                                {% if sold_list %}
-                                    <form class="form" id="formSale{{horse.id}}" action="{% url 'records:cancel-sell-horse' pk=horse.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <button type="button" class="btn btn-info btn-sm anceller">Cancel Sale</button>
-                                    </form>
-                                {% else %}
-                                    <form class="form" id="formSale{{horse.id}}" action="{% url 'records:sell-horse' pk=horse.id %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" value="0" name="price">
-                                        <button type="button" class="btn btn-info btn-sm seller">Sell</button>
-                                    </form>
-                                {% endif %}
                             </td>
                         </tr>
                         {% endwith %}
@@ -73,12 +45,47 @@
                     {% else %}
                         <tr>
                             <td colspan="9" style="text-align:center">
-                                No horses have been created yet.
+                                No farms have been created yet.
                             </td>
                         </tr>
                     {% endif %}
                 </tbody>
             </table>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+            <form class="form" action="" method="POST">
+                {% csrf_token %}
+                <div class="card text-center">
+                    <h3 class="card-header default-color-dark white-text">
+                        Create Farm.
+                    </h3>
+                    <div class="card-block">
+                        <div class="md-form {% if form.name.errors %} has-errors {% endif %}">
+                            <label for="{{form.name.id_for_label}}">{{form.name.label}}</label>
+                            {% render_field form.name class+="form-control" %}
+                            {% if form.name.errors %}
+                                {%  for error in form.name.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="md-form {% if form.address.errors %} has-errors {% endif %}">
+                            <label for="{{form.address.id_for_label}}">{{form.address.label}}</label>
+                            {% render_field form.address class+="md-textarea" %}
+                            {% if form.address.errors %}
+                                {%  for error in form.address.errors %}
+                                     <li style="color:red"> {{ error }} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                     <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>
+                </div>  
+            </form>
         </div>
     </div>
 </div>
@@ -87,18 +94,18 @@
 {% block js %}
 <script type="text/javascript">
     $(document).ready(function() {
-        $("#resetButton").click(function() {
-            $("#keyword").val("")
-            $("#weight_upper").val("")
-            $("#pregnant").val("")
-            $("#upper_age").val("")
-            $("#end").datepicker("update", "")
-            $("#weight_lower").val("")
-            $("#gender").val("")
-            $("#lower_age").val("")
-            $("#start").datepicker("update", "")
-            $("#age_class").val("0")
-            $(".label").show()
+        $.fn.enterKey = function (fnc) {
+            return this.each(function () {
+                $(this).keypress(function (ev) {
+                    var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+                    if (keycode == '13') {
+                        fnc.call(this, ev);
+                    }
+                })
+            })
+        }
+        $("#keyword").enterKey(function() {
+            $(this).closest("form").submit()
         })
         $("input").on('input', function() {
             var $label = $("label[for='"+$(this).attr('id')+"']");
@@ -109,124 +116,6 @@
             if ($(this).val() == "") {            
             $label.show()
             }
-        })
-        if ($("#keyword").val() != ""       || $("#weight_lower").val() != "" ||
-            $("#weight_upper").val() != ""  || $("#gender").val() != "" || 
-            $("#pregnant").val() != ""      || $("#lower_age").val() != "" || 
-            $("#upper_age").val() != ""     || $("#start").val() != "" || 
-            $("#end").val() != "") {
-                if ($("#keyword").val() != "") { 
-                    var $label = $("label[for='"+$("#keyword").attr('id')+"']");
-                    $label.hide()
-                }
-                if ($("#weight_upper").val() != "") { 
-                    var $label = $("label[for='"+$("#weight_upper").attr('id')+"']");
-                    $label.hide()
-                }
-                if ($("#upper_age").val() != "") {
-                    var $label = $("label[for='"+$("#upper_age").attr('id')+"']");
-                    $label.hide()
-                }
-                if ($("#weight_lower").val() != "") { 
-                    var $label = $("label[for='"+$("#weight_lower").attr('id')+"']");
-                    $label.hide()
-                }
-                if ($("#lower_age").val() != "") {
-                    var $label = $("label[for='"+$("#lower_age").attr('id')+"']");
-                    $label.hide()
-                }
-                $header = $(".filter-collapsed");
-                $content = $header.next();
-
-                $content.slideToggle(500, function () {
-                    if ($content.is(":visible")) {
-                        $(".fa-chevron-up").css("display","inline-block");
-                        $(".fa-chevron-down").css("display", "none");
-                    }
-                    else {
-                        $(".fa-chevron-up").css("display", "none");
-                        $(".fa-chevron-down").css("display","inline-block");
-                    }
-                });
-        }
-        // Format works here but not in normal datepicker...
-        $('.input-daterange input').each(function() {
-            $(this).datepicker();
-        });
-        $(".filter-collapsed").click(function () {
-
-            $header = $(".filter-collapsed");
-            $content = $header.next();
-
-            $content.slideToggle(500, function () {
-
-                    if ($content.is(":visible")) {
-                            $(".fa-chevron-up").css("display","inline-block");
-                            $(".fa-chevron-down").css("display", "none");
-                    }
-                    else {
-                            $(".fa-chevron-up").css("display", "none");
-                            $(".fa-chevron-down").css("display","inline-block");
-                    }
-
-
-            });
-
-        });
-        $(".seller").click(function() {
-            var $form = $(this).closest(".form")
-            var name = "#"+$form.attr('id')+" :input"
-            var $price;
-            $(name).each(function() {
-                var $input = $(this)
-                if ($input.attr("name") != undefined && $input.attr("name").localeCompare("price") == 0) {
-                    $price = $(this)
-                }
-            })
-            $.confirm({
-                backgroundDismiss: false,
-                escpaeKey: false,
-                backgroundDismissAnimation: 'shake',
-                title: "Confirm sale",
-                content: "<form action='' class='form'><div class='form-group'><label for='value'>Sale Price</label><input type='number' class='value form-control' name='value' id='saleValue' required></div></form>",
-                buttons:{
-                    formSubmit: {
-                        text: "Submit",
-                        btnClass: 'btn-blue',
-                        action: function() {
-                            var value = this.$content.find('.value').val();
-                            if (!value) {
-                                $.alert('Please provide a sale price.')
-                                return false;
-                            }
-                            $price.val(value)
-                            $form.submit()
-                        }
-                    },
-                    cancel: function() {
-
-                    }
-                }
-            })
-        })
-        $(".canceller").click(function() {
-            $form =  $(this).closest("form")
-            $.confirm({
-                backgroundDismiss: false,
-                escapeKey: false,
-                backgroundDismissAnimation: 'shake',
-                title: 'Are you sure?',
-                content: 'This action will erase this horse\'s sale price and move the horse back to regular list!',
-                buttons: {
-                    confirm: function () {
-                        $form.submit()
-                        
-                    },
-                    cancel: function () {
-                        
-                    },
-                }
-            });
         })
         $(".submitter").click(function() {
             $form =  $(this).closest("form")

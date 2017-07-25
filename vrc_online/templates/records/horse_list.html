@@ -57,7 +57,7 @@
                                 {% if sold_list %}
                                     <form class="form" id="formSale{{horse.id}}" action="{% url 'records:cancel-sell-horse' pk=horse.id %}" method="POST">
                                         {% csrf_token %}
-                                        <button type="button" class="btn btn-info btn-sm anceller">Cancel Sale</button>
+                                        <button type="button" class="btn btn-info btn-sm canceller">Cancel Sale</button>
                                     </form>
                                 {% else %}
                                     <form class="form" id="formSale{{horse.id}}" action="{% url 'records:sell-horse' pk=horse.id %}" method="POST">
