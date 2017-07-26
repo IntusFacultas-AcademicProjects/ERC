@@ -1,10 +1,72 @@
 {% extends 'session/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-  <h2>Sign up</h2>
-  <form method="post">
+<div class="container" style="margin-top:15px;">
+  <form class="form" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
+    <div class="card text-center">
+        <h2 class="card-header default-color-dark white-text">
+            Sign up
+        </h2>
+        <div class="card-block">
+            <div class="row form-group">
+                <label for="{{form.username.id_for_label}}">{{form.username.label}}</label>
+                {% render_field form.username class+="form-control" %}
+                <span for="{{form.username.id_for_label}}" class="helptext">Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</span>
+            </div>
+            <div class="row form-group">
+                <label for="{{form.email.id_for_label}}">{{form.email.label}}</label>
+                {% render_field form.email class+="form-control" %}
+                <span for="{{form.email.id_for_label}}" class="helptext">Required. Input a valid email address.</span>
+            </div>
+            <div class="row form-group">
+                <label for="{{form.password1.id_for_label}}">{{form.password1.label}}</label>
+                {% render_field form.password1 class+="form-control" %}
+                <span for="{{form.password1.id_for_label}}" class="helptext">
+                    <ul>
+                        <li>Your password can&#39;t be too similar to your other personal information.</li>
+                        <li>Your password must contain at least 8 characters.</li>
+                        <li>Your password can&#39;t be a commonly used password.</li>
+                        <li>Your password can&#39;t be entirely numeric.</li>
+                    </ul>
+                </span>
+            </div>
+            <div class="row form-group">
+                <label for="{{form.password2.id_for_label}}">{{form.password2.label}}</label>
+                {% render_field form.password2 class+="form-control" %}
+                <span for="{{form.password2.id_for_label}}" class="helptext">Enter the same password as before, for verification.</span>
+            </div>
+        </div>
+        <div class="card-footer text-muted default-color-dark white-text">
+            <div class="form-group">
+                <input type="submit" value="Sign up" class="btn btn-primary"/> 
+            </div>
+        </div>
+    </div>
   </form>
 {% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+    $(function() {
+        $(".helptext").each(function() {
+                $(this).fadeOut(2)
+            })
+        $("input").on("click", function() {
+            var $input = $(this)
+            $(".helptext").each(function() {
+                console.log($(this).attr("for"))
+                console.log($input.attr("id"))
+                console.log($(this).attr("for").localeCompare($input.attr("id")) == 0)
+                if ($(this).attr("for").localeCompare($input.attr("id")) == 0) {
+                    $(this).fadeIn(200)
+                }
+                else {
+                    $(this).fadeOut(200)
+                }
+            })
+        })
+    })
+</script>
+{% endblock js %}

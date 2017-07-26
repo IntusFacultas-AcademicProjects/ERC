@@ -1,0 +1,115 @@
+{% extends 'farms/base.html' %}
+{% load widget_tweaks %}
+{% load record_filters %}
+{% block content %}
+<div class="container-fluid" style="margin-top:15px;">
+    <div class="row">
+        <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
+            <div class="card-block">
+                <h4 class="card-title">What's this?</h4>
+                <p class="card-text" >Add or remove horses from {{farm.name}}</p> 
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top:15px">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <form class="form" action="" method="POST">
+                <input type="hidden" name="_method" value="ADD_HORSES">
+                {% csrf_token %}
+                <div class="card text-center">
+                    <h3 class="card-header default-color-dark white-text">
+                        Add Horses to {{farm.name}}.
+                    </h3>
+                    <div class="card-block">
+                        <label for="horses">
+                            Select one or more horses to add to {{farm.name}}
+                            <select style="width:100%" class="multi-drop" id="horses" multiple="multiple" name="horses">
+                            {% for horse in horses %}
+                                <option value="{{horse.id}}">{{horse.name}}</option>
+                            {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <form class="form" action="" method="POST">
+                <input type="hidden" name="_method" value="EDIT_FARM">
+                {% csrf_token %}
+                <div class="card text-center">
+                    <h3 class="card-header default-color-dark white-text">
+                        Edit {{farm.name}}.
+                    </h3>
+                    <div class="card-block">
+                        <div class="row form-group">
+                            <label for="{{form.name.id_for_label}}">{{form.name.label}}</label>
+                            {% render_field form.name class+="form-control" %}
+                        </div>
+                        <div class="row form-group">
+                            <label for="{{form.address.id_for_label}}">{{form.address.label}}</label>
+                            {% render_field form.address class+="md-textarea" %}
+                        </div>
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <form class="form" action="" method="POST">
+                <input type="hidden" name="_method" value="REMOVE_HORSES">
+                {% csrf_token %}
+                <div class="card text-center">
+                    <h3 class="card-header default-color-dark white-text">
+                        Remove Horses from {{farm.name}}.
+                    </h3>
+                    <div class="card-block">
+                        <label for="horses">
+                            Select one or more horses to remove from {{farm.name}}
+                            <select style="width:100%" class="multi-drop" id="horses" multiple="multiple" name="horses">
+                            {% for horse in farm_horses %}
+                                <option value="{{horse.id}}">{{horse.name}}</option>
+                            {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="card-footer text-muted default-color-dark white-text">
+                        <div class="form-group">
+                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $.fn.enterKey = function (fnc) {
+            return this.each(function () {
+                $(this).keypress(function (ev) {
+                    var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+                    if (keycode == '13') {
+                        fnc.call(this, ev);
+                    }
+                })
+            })
+        }
+        $( ".multi-drop" ).select2({
+            theme: "bootstrap"
+        });
+    }) 
+</script>
+{% endblock js %}

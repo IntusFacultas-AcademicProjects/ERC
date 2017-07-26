@@ -40,7 +40,7 @@
                                 <a class="btn btn-primary btn-sm" href="{% url 'records:review-horse' pk=horse.id %}">Review</a>
                             </td>
                             <td>{{horse.name}}</td>
-                            <td>{% if horse.farm %} {{horse.farm}} {% endif %}</td>
+                            <td>{% if horse.farm %} {{horse.farm.name}} {% endif %}</td>
                             <td>{{horse.dob}}</td>
                             <td>{{years|get_item:num}} Years {{months|get_item:num}} Months</td>
                             <td>{{horse.get_gender_display}}</td>
@@ -98,6 +98,7 @@
             $("#lower_age").val("")
             $("#start").datepicker("update", "")
             $("#age_class").val("0")
+            $("#farm").val("")
             $(".label").show()
         })
         $("input").on('input', function() {
@@ -114,7 +115,7 @@
             $("#weight_upper").val() != ""  || $("#gender").val() != "" || 
             $("#pregnant").val() != ""      || $("#lower_age").val() != "" || 
             $("#upper_age").val() != ""     || $("#start").val() != "" || 
-            $("#end").val() != "") {
+            $("#end").val() != ""           || $("#farm").val() != "") {
                 if ($("#keyword").val() != "") { 
                     var $label = $("label[for='"+$("#keyword").attr('id')+"']");
                     $label.hide()

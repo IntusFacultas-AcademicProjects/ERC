@@ -11,5 +11,6 @@ class Farm(models.Model):
         "Address", max_length=256, blank=True, null=True)
     profile = models.ForeignKey(Profile,
                                 on_delete=models.CASCADE,
-                                related_name="farms"
+                                related_name="farms",
+                                blank=True, null=True
                                 )

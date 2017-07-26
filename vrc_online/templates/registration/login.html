@@ -1,12 +1,32 @@
-{% extends 'records/base.html' %}
-
-{% block title %}Login{% endblock %}
+{% extends 'session/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
-  <h2>Login</h2>
-  <form method="post">
+<div class="container" style="margin-top:15px;">
+  <form class="form" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
+    <div class="card text-center">
+        <h2 class="card-header default-color-dark white-text">
+            Login
+        </h2>
+        <div class="card-block">
+            <div class="row form-group">
+                <label for="{{form.username.id_for_label}}">{{form.username.label}}</label>
+                {% render_field form.username class+="form-control" %}
+            </div>
+            <div class="row form-group">
+                <label for="{{form.password.id_for_label}}">{{form.password.label}}</label>
+                {% render_field form.password class+="form-control" %}
+            </div>
+            <div class="row form-group" style="padding:0px; margin:0px">
+                <a href="{% url 'session:password_reset' %}">Forgot my password</a>
+            </div>
+        </div>
+         <div class="card-footer text-muted default-color-dark white-text">
+            <div class="form-group">
+                <input type="submit" value="Submit" class="btn btn-primary"/> 
+            </div>
+        </div>
   </form>
+</div>
 {% endblock %}

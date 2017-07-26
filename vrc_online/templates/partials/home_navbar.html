@@ -1,0 +1,32 @@
+<!--Navbar-->
+<nav class="navbar navbar-toggleable-lg navbar-dark default-color-dark">
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNav1" aria-controls="navbarNav1" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <a class="navbar-brand" href="{% url 'session:home' %}">
+        <i class="fa fa-clipboard fa-lg" aria-hidden="true"></i>
+        <strong>ERC</strong>
+    </a>
+    <div class="collapse navbar-collapse" id="navbarNav1">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a href="{% url 'session:home' %}" class="nav-link">Home <span class="sr-only"></span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href=" url 'farms:farm-list' ">About</a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'session:login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'session:signup' %}">Create an Account</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href=" url 'session:contact'">Contact Us</a>
+            </li>
+        </ul>
+        
+    </div>
+</nav>

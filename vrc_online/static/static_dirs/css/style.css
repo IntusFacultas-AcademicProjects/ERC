@@ -15,7 +15,12 @@
 .deployable-div.expand {
     max-height:580;
 }
-
+#slides {
+    display:none;
+}
+.slidejs-navigation {
+    display:none !important;
+}
 @media (min-width: 768px) {
   .modal-xl {
     width: 90%;

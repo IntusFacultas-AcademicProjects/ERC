@@ -1,10 +1,49 @@
 {% extends 'session/base.html' %}
-
+{% load static %}
 {% block title %}Login{% endblock %}
 
 {% block content %}
   <h2>Future Landing Page</h2>
-  <a class="btn btn-primary" href="{% url 'session:signup' %}">Create Account</a>
-  <a class="btn btn-primary" href="{% url 'session:login' %}">Login</a>
-  </form>
+
+  <div id="slides" class="blur-box" style="width:60%; height: 30%">
+    <img src="{% static 'img/image1.jpeg' %}">
+    <img src="{% static 'img/image3.png' %}">
+    <img src="{% static 'img/image2.jpeg' %}">
+    <img src="{% static 'img/image4.jpeg' %}">
+    <img src="{% static 'img/image5.jpeg' %}">
+  </div>
 {% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+        // var width = window.innerWidth * .5
+        // var height = window.innerHeight * .5
+        $("#slides").slidesjs({
+            width: 500,
+            height: 500,
+            navigation: {
+              active: false,
+            },
+            play: {
+              active: false,
+                // [boolean] Generate the play and stop buttons.
+                // You cannot use your own buttons. Sorry.
+              effect: "fade",
+                // [string] Can be either "slide" or "fade".
+              interval: 5000,
+                // [number] Time spent on each slide in milliseconds.
+              auto: true,
+                // [boolean] Start playing the slideshow on load.
+              swap: false,
+                // [boolean] show/hide stop and play buttons
+              pauseOnHover: true,
+                // [boolean] pause a playing slideshow on hover
+              restartDelay: 2500
+                // [number] restart delay on inactive slideshow
+            },
+            pagination: {
+              active: false,
+            }
+        });
+</script>
+{% endblock js %}

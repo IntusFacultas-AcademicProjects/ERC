@@ -32,7 +32,7 @@ from .forms import SignUpForm
 
 def logoutUser(request):
 	if request.user and request.user.is_authenticated():
-		logout(request.user)
+		logout(request)
 		return redirect("session:home")
 	return redirect("session:login")
 

@@ -57,7 +57,8 @@ class Horse(models.Model):
     )
     profile = models.ForeignKey(Profile,
                                 on_delete=models.CASCADE,
-                                related_name="horses"
+                                related_name="horses",
+                                blank=True, null=True
                                 )
 
     def save(self, force_insert=False, force_update=False):
@@ -120,7 +121,8 @@ class Medicine(models.Model):
     )
     profile = models.ForeignKey(Profile,
                                 on_delete=models.CASCADE,
-                                related_name="medicines"
+                                related_name="medicines",
+                                blank=True, null=True
                                 )
     # Fields required for all medicines
     name = models.CharField(max_length=32)
@@ -161,12 +163,14 @@ class CalendarEvent(models.Model):
         related_name="events",
         null=True,
     )
+    birth = models.BooleanField(_("Birth Event"), default=False)
     medicine = models.ForeignKey(
         Medicine, on_delete=models.CASCADE, related_name="events",
         blank=True, null=True)
     profile = models.ForeignKey(Profile,
                                 on_delete=models.CASCADE,
-                                related_name="events"
+                                related_name="events",
+                                blank=True, null=True
                                 )
 
     class Meta:
@@ -214,12 +218,14 @@ class Schedule(models.Model):
     )
 
     def __str__(self):
-        msg = "Medicine: {} | Doses: {} | Frequency: {} | Interval: {} | Classification: {}".format(self.medicine.name,
-                                                                                                    self.doses,
-                                                                                                    self.frequency,
-                                                                                                    self.interval,
-                                                                                                    self.classification
-                                                                                                    )
+        msg = "Medicine: {} | Doses: {} | Frequency: {} | " + \
+            "Interval: {} | Classification: {}".format(
+                self.medicine.name,
+                self.doses,
+                self.frequency,
+                self.interval,
+                self.classification
+            )
         return msg
 
 

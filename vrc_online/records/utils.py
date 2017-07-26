@@ -2,6 +2,7 @@ import math
 from datetime import date, datetime, time
 from dateutil import relativedelta
 from .models import CalendarEvent, Schedule, Medicine, MedicalEvent
+from session.models import Profile
 
 # converts 1 into 1st, 2 into 2nd, etc.
 ordinal = lambda n: "%d%s" % (
@@ -24,8 +25,11 @@ def already_exists(events, date, msg):
     return False
 
 
-def update_history(horse):
-    events = CalendarEvent.objects.filter(horse__pk=horse.id)
+def update_history(request, horse):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    events = CalendarEvent.objects.filter(
+        horse__pk=horse.id, profile__id=profile.id)
     already_existing_events = horse.history.events.all()
     for event in events:
         if event.medicine is not None:
@@ -34,69 +38,87 @@ def update_history(horse):
                     horse.name,
                     event.medicine.name,
                 )
-                if not already_exists(already_existing_events, event.start, msg):
+                if not already_exists(
+                        already_existing_events, event.start, msg):
                     MedicalEvent.objects.create(
                         date=event.start,
                         msg=msg,
-                        history=horse.history)
+                        history=horse.history,
+                        profile=profile)
 
 
-def update_event(horse=None, medicine=None):
+def update_event(request, horse=None, medicine=None):
     if medicine is not None:
-        delete_event(medicine=medicine)
+        delete_event(request, medicine=medicine)
         horses = medicine.horses.all()
         for horse in horses:
-            create_event(horse, medicine)
+            create_event(request, horse, medicine)
     elif horse is not None:
-        delete_event(horse=horse)
+        delete_event(request, horse=horse)
         medicines = horse.medicine_set.all()
         for medicine in medicines:
-            create_event(horse, medicine)
+            create_event(request, horse, medicine)
+        birth_event = horse.events.get(birth=True)
+        birth_event.title = "{} was born today.".format(horse.name)
+        birth_event.start = datetime.combine(horse.dob, time.min)
+        birth_event.end = datetime.combine(horse.dob, time.max)
+        birth_event.save()
 
 
-def delete_event(horse=None, medicine=None):
+def delete_event(request, horse=None, medicine=None, delete=False):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     events = None
-    print(horse)
-    print(medicine)
-    if horse is not None and medicine is not None:
-        events = CalendarEvent.objects.filter(
-            horse__pk=horse.id, medicine__pk=medicine.id)
-    elif horse is None and medicine is not None:
-        events = CalendarEvent.objects.filter(medicine__pk=medicine.id)
-    elif horse is not None and medicine is None:
-        events = CalendarEvent.objects.filter(horse__pk=horse.id)
-    print(events)
-    events.delete()
-
-
-def delete_temp_event(horse=None, medicine=None):
-    events = None
-    print(horse)
-    print(medicine)
     if horse is not None and medicine is not None:
         events = CalendarEvent.objects.filter(
             horse__pk=horse.id, medicine__pk=medicine.id,
+            profile__id=profile.id)
+    elif horse is None and medicine is not None:
+        events = CalendarEvent.objects.filter(medicine__pk=medicine.id,
+                                              profile__id=profile.id)
+    elif horse is not None and medicine is None:
+        events = CalendarEvent.objects.filter(horse__pk=horse.id,
+                                              profile__id=profile.id)
+    if not delete:
+        events = events.exclude(birth=True)
+    events.delete()
+
+
+def delete_temp_event(request, horse=None, medicine=None):
+    events = None
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    if horse is not None and medicine is not None:
+        events = CalendarEvent.objects.filter(
+            horse__pk=horse.id, medicine__pk=medicine.id,
+            profile__id=profile.id
         )
         events = events.filter(start__gt=datetime.today(),)
         events.delete()
 
 
-def create_birth_event(horse, date):
+def create_birth_event(request, horse, date):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     CalendarEvent.objects.create(
         title="{} was born today.".format(horse.name),
         start=datetime.combine(date, time.min),
         end=datetime.combine(date, time.max),
         all_day=True,
         medicine=None,
-        horse=horse
+        horse=horse,
+        birth=True,
+        profile=profile
     )
 
 
-def create_temp_event(horse, medicine):
+def create_temp_event(request, horse, medicine):
     """
     Similar to create_event, but uses the
     built in application data of the medicine
     """
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     gender_picker = ["his", "her"]
     frequency = medicine.frequency
     interval = medicine.interval
@@ -110,17 +132,13 @@ def create_temp_event(horse, medicine):
         age(horse) > FOAL_LIMIT
     age_matches = age_matches or classification == Schedule.ALL
     if pregnant_matches or foal_matches or age_matches:
-        print("passed")
         date = None
         offset = None
         if medicine.date_to_start is not None:
-            print("dts is not None")
             date = medicine.date_to_start
         else:
             if horse.pregnant == horse.PREGNANT and \
                     classification == Schedule.PREGNANT:
-                print("pregnant")
-                print(horse.date_of_impregnation)
                 date = horse.date_of_impregnation
             else:
                 date = horse.dob
@@ -132,7 +150,6 @@ def create_temp_event(horse, medicine):
                 offset = relativedelta.relativedelta(
                     weeks=offset_multiplier
                 )
-                print(offset)
             elif interval == Schedule.MONTHS:
                 offset = relativedelta.relativedelta(
                     months=offset_multiplier
@@ -152,22 +169,24 @@ def create_temp_event(horse, medicine):
             msg = "{} needs {} {} dose of {}".format(
                 horse.name, gender_picker[horse.gender],
                 ordinal(doses_count + 1), medicine.name)
-            print(application_date_start)
             CalendarEvent.objects.create(
                 title=msg,
                 start=application_date_start,
                 end=application_date_end,
                 all_day=True,
                 medicine=medicine,
-                horse=horse
+                horse=horse,
+                profile=profile,
             )
 
 
-def create_event(horse, medicine):
+def create_event(request, horse, medicine):
     """
     If the pregnancy status or the age group matches, generate every single
     application event for the medicine and save it.
     """
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     schedules = medicine.schedules.all()
     gender_picker = ["his", "her"]
     for schedule in schedules:
@@ -183,17 +202,13 @@ def create_event(horse, medicine):
             age(horse) > FOAL_LIMIT
         age_matches = age_matches or classification == Schedule.ALL
         if pregnant_matches or foal_matches or age_matches:
-            print("passed")
             date = None
             offset = None
             if medicine.date_to_start is not None:
-                print("dts is not None")
                 date = medicine.date_to_start
             else:
                 if horse.pregnant == horse.PREGNANT and \
                         classification == Schedule.PREGNANT:
-                    print("pregnant")
-                    print(horse.date_of_impregnation)
                     date = horse.date_of_impregnation
                 else:
                     date = horse.dob
@@ -205,7 +220,6 @@ def create_event(horse, medicine):
                     offset = relativedelta.relativedelta(
                         weeks=offset_multiplier
                     )
-                    print(offset)
                 elif interval == Schedule.MONTHS:
                     offset = relativedelta.relativedelta(
                         months=offset_multiplier
@@ -225,14 +239,14 @@ def create_event(horse, medicine):
                 msg = "{} needs {} {} dose of {}".format(
                     horse.name, gender_picker[horse.gender],
                     ordinal(doses_count + 1), medicine.name)
-                print(application_date_start)
                 CalendarEvent.objects.create(
                     title=msg,
                     start=application_date_start,
                     end=application_date_end,
                     all_day=True,
                     medicine=medicine,
-                    horse=horse
+                    horse=horse,
+                    profile=profile,
                 )
 
 
@@ -255,9 +269,12 @@ def expired(start_date, today, medicine):
     return final_date < today
 
 
-def remove_temporary_medicines(horse):
+def remove_temporary_medicines(request, horse):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     temporary_medicines = Medicine.objects.filter(
-        date_to_start__isnull=False, horse__pk=horse.id)
+        date_to_start__isnull=False, horse__pk=horse.id,
+        profile__id=profile.id)
     today = datetime.combine(date.today(), time.max)
     condemned_medicines = {}
     for medicine in temporary_medicines:
@@ -265,4 +282,4 @@ def remove_temporary_medicines(horse):
         if expired(medicine_start_date, today, medicine):
             condemned_medicines[medicine.id] = medicine
     for medicine in condemned_medicines:
-        Medicine.objects.get(pk=medicine).delete()
+        Medicine.objects.get(pk=medicine, profile__id=profile.id).delete()

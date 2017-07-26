@@ -63,7 +63,11 @@
                 </div>            
             </div>
             <div class="row md-form form-group">
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <label class="label" for="keyword"  >Keyword</label class="label">
+                     <input class="form-control" {% if keyword is not None %} value="{{keyword}}" {% endif %} type="text" id="keyword" name="keyword" />
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <label class="label" for="pregnant"  >Pregnancy status</label class="label"><br/>
                    <select name="pregnant" class="form-control" id="pregnant">
                         <option value="" {% if pregnant is None %}selected="selected" {% endif %}>Either</option>
@@ -71,7 +75,7 @@
                         <option value="1"{% if pregnant == "1" %}selected="selected" {% endif %}>Pregnant</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                     <label class="label" for="gender"  >Gender</label class="label"><br/>
                     <select name="gender" class="form-control" id="gender">
                         <option value=""  {% if gender is None %} selected="selected" {% endif %}>Any</option>
@@ -79,9 +83,15 @@
                         <option value="1" {% if gender == "1" %} selected="selected" {% endif %}>Mare</option>
                     </select>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-                    <label class="label" for="keyword"  >Keyword</label class="label">
-                     <input class="form-control" {% if keyword is not None %} value="{{keyword}}" {% endif %} type="text" id="keyword" name="keyword" />
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                    <label class="label" for="farm"  >Farm</label class="label"><br/>
+                   <select name="farm" class="form-control" id="farm">
+                        <option value="" {% if farm is None %} selected="selected" {% endif %}>Any</option>
+                        {% if farm is not None %}<option value="{{farm}}" selected="selected">{{farmName}}</option>{% endif %}
+                        {% for farmItem in farms %}
+                            <option value="{{farmItem.id}}">{{farmItem.name}}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
             <div class="row md-form form-group">

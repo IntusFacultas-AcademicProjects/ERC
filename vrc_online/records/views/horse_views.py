@@ -13,8 +13,12 @@ from django.contrib import messages
 
 from records.forms import HorseForm, TemporaryMedicineForm
 from records.models import Medicine, Horse
-from records.utils import remove_temporary_medicines, update_event, \
+from records.utils import (
+    remove_temporary_medicines, update_event,
     delete_event, create_event, create_birth_event, create_temp_event
+)
+from session.models import Profile
+from farms.models import Farm
 
 
 class SoldHorseList(LoginRequiredMixin, View):
@@ -30,7 +34,11 @@ class SoldHorseList(LoginRequiredMixin, View):
             ' plans. Click "Delete" on the right to delete that horse.'
         sold_list = True
         horses = Horse.objects.all()
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
+        horses = horses.filter(profile__id=profile.id)
         horses = horses.filter(sold=True)
+        farms = Farm.objects.all().filter(profile__id=profile.id)
         parameters = request.GET.copy()
         parameters = {k: v for k, v in parameters.items() if v}
         keyword = parameters.get("keyword", None)
@@ -41,6 +49,8 @@ class SoldHorseList(LoginRequiredMixin, View):
         upper_age = parameters.get("lower_age", None)
         lower_age = parameters.get("upper_age", None)
         age_class = parameters.get("age_class", None)
+        farm = parameters.get("farm", None)
+        farmName = None
         start = parameters.get("start", None)
         end = parameters.get("end", None)
         if keyword is not None:
@@ -61,6 +71,10 @@ class SoldHorseList(LoginRequiredMixin, View):
         if pregnant is not None:
             if pregnant != "":
                 horses = horses.filter(pregnant=pregnant)
+        if farm is not None:
+            horses = horses.filter(farm__id=farm)
+            farms = farms.exclude(id=farm)
+            farmName = Farm.objects.get(id=farm, profile__id=profile.id).name
         if lower_age is not None:
             if upper_age is not None:
                 if int(age_class) == 0:
@@ -117,6 +131,7 @@ class SoldHorseList(LoginRequiredMixin, View):
             start = start.strftime("%m/%d/%Y")
         if end is not None:
             end = end.strftime("%m/%d/%Y")
+
         return render(
             request,
             'records/horse_list.html',
@@ -133,10 +148,13 @@ class SoldHorseList(LoginRequiredMixin, View):
                 "lower_age": upper_age,
                 "age_class": age_class,
                 "start": start,
+                "farm": farm,
                 "end": end,
                 "age_class": age_class,
                 "message": message,
-                "sold_list": sold_list
+                "sold_list": sold_list,
+                "farms": farms,
+                "farmName": farmName,
             }
         )
 
@@ -154,6 +172,11 @@ class HorseList(LoginRequiredMixin, View):
             ' medical' + \
             ' plans. Click "Delete" on the right to delete that horse.'
         horses = Horse.objects.all()
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
+        farms = Farm.objects.all().filter(profile__id=profile.id)
+        # only get horses for one profile
+        horses = horses.filter(profile__id=profile.id)
         horses = horses.filter(sold=False)
         parameters = request.GET.copy()
         parameters = {k: v for k, v in parameters.items() if v}
@@ -162,10 +185,12 @@ class HorseList(LoginRequiredMixin, View):
         weight_upper = parameters.get("weight_upper", None)
         gender = parameters.get("gender", None)
         pregnant = parameters.get("pregnant", None)
+        farm = parameters.get("farm", None)
         upper_age = parameters.get("lower_age", None)
         lower_age = parameters.get("upper_age", None)
         age_class = parameters.get("age_class", None)
         start = parameters.get("start", None)
+        farmName = None
         end = parameters.get("end", None)
         if keyword is not None:
             horses = horses.filter(Q(name__icontains=keyword) |
@@ -185,6 +210,10 @@ class HorseList(LoginRequiredMixin, View):
         if pregnant is not None:
             if pregnant != "":
                 horses = horses.filter(pregnant=pregnant)
+        if farm is not None:
+            horses = horses.filter(farm__id=farm)
+            farms = farms.exclude(id=farm)
+            farmName = Farm.objects.get(id=farm, profile__id=profile.id).name
         if lower_age is not None:
             if upper_age is not None:
                 if int(age_class) == 0:
@@ -257,16 +286,21 @@ class HorseList(LoginRequiredMixin, View):
                 "age_class": age_class,
                 "start": start,
                 "end": end,
+                "farm": farm,
                 "age_class": age_class,
                 "message": message,
                 "sold_list": sold_list,
+                "farms": farms,
+                "farmName": farmName,
             }
         )
 
 
 @login_required
 def cancel_sell_horse(request, pk):
-    horse = Horse.objects.get(pk=pk)
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    horse = Horse.objects.get(pk=pk, profile__id=profile.id)
     horse.sold = False
     horse.sale_price = 0
     horse.save()
@@ -276,7 +310,9 @@ def cancel_sell_horse(request, pk):
 
 @login_required
 def sell_horse(request, pk):
-    horse = Horse.objects.get(pk=pk)
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    horse = Horse.objects.get(pk=pk, profile__id=profile.id)
     horse.sold = True
     horse.sale_price = request.POST.get("price")
     horse.save()
@@ -303,15 +339,18 @@ class HorseView(LoginRequiredMixin, View):
         return year + "-" + month + "-" + day
 
     def get(self, request, pk):
-        horse = Horse.objects.get(pk=pk)
-        remove_temporary_medicines(horse)
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
+        horse = Horse.objects.get(pk=pk, profile__id=profile.id)
+        remove_temporary_medicines(request, horse)
         medicines = horse.medicine_set.all()
         schedules = {}
         """
         add_medicines are all medicines that are not
         already added to the horse and are not temporary.
         """
-        add_medicines = Medicine.objects.exclude(id__in=medicines)
+        add_medicines = Medicine.objects.filter(
+            profile__id=profile.id).exclude(id__in=medicines)
         add_medicines = add_medicines.filter(horse__isnull=True)
         for medicine in medicines:
             schedules[medicine.id] = medicine.schedules.all()
@@ -320,7 +359,7 @@ class HorseView(LoginRequiredMixin, View):
         for medicine in add_medicines:
             add_schedules[medicine.id] = medicine.schedules.all()
         temporary_medicines = Medicine.objects.filter(
-            date_to_start__isnull=False, horse__pk=pk)
+            date_to_start__isnull=False, horse__pk=pk, profile__id=profile.id)
         temp_med_form = TemporaryMedicineForm()
         return render(request,
                       'records/horse_view.html',
@@ -344,7 +383,9 @@ class HorseView(LoginRequiredMixin, View):
         3: Adds Temporary Medicines
         4: Attaches new medicines
         """
-        horse = Horse.objects.filter(pk=pk)
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
+        horse = Horse.objects.filter(pk=pk, profile__id=profile.id)
         parameters = request.POST.copy()
         del parameters['csrfmiddlewaretoken']
         if parameters.get("_method") == "HORSE":
@@ -360,10 +401,11 @@ class HorseView(LoginRequiredMixin, View):
             parameters['age'] = self.monthdelta(date, today)
             form = HorseForm(parameters)
             if not form.is_valid():
-                horse = Horse.objects.get(pk=pk)
+                horse = Horse.objects.get(pk=pk, profile__id=profile.id)
                 medicines = horse.medicine_set.all()
                 schedules = {}
-                add_medicines = Medicine.objects.exclude(id__in=medicines)
+                add_medicines = Medicine.objects.filter(
+                    profile__id=profile.id).exclude(id__in=medicines)
                 add_medicines = add_medicines.filter(horse__isnull=True)
                 for medicine in medicines:
                     schedules[medicine.id] = medicine.schedules.all()
@@ -371,7 +413,8 @@ class HorseView(LoginRequiredMixin, View):
                 for medicine in add_medicines:
                     add_schedules[medicine.id] = medicine.schedules.all()
                 temporary_medicines = Medicine.objects.filter(
-                    date_to_start__isnull=False, horse__pk=pk)
+                    date_to_start__isnull=False, horse__pk=pk,
+                    profile__id=profile.id)
                 temp_med_form = TemporaryMedicineForm()
                 return render(request,
                               'records/horse_view.html',
@@ -403,16 +446,17 @@ class HorseView(LoginRequiredMixin, View):
             messages.success(request, "Horse successfully updated.")
             horse = Horse.objects.get(pk=pk)
             horse.refresh_from_db()
-            update_event(horse=horse)
+            update_event(request, horse=horse)
             return HttpResponseRedirect(
                 reverse_lazy('records:review-horse', kwargs={"pk": pk})
             )
         elif parameters.get("_method") == "DELETE_MEDICINE":
             del parameters['_method']
-            horse = Horse.objects.get(pk=pk)
+            horse = Horse.objects.get(pk=pk, profile__id=profile.id)
             for key, value in parameters.items():
-                medicine = Medicine.objects.get(pk=int(key))
-                delete_event(horse=horse, medicine=medicine)
+                medicine = Medicine.objects.get(pk=int(key),
+                                                profile__id=profile.id)
+                delete_event(request, horse=horse, medicine=medicine)
                 medicine.horses.remove(horse)
             messages.success(request, "Medicine successfully removed.")
             return HttpResponseRedirect(
@@ -422,8 +466,9 @@ class HorseView(LoginRequiredMixin, View):
             del parameters['_method']
             horse = Horse.objects.get(pk=pk)
             for key, value in parameters.items():
-                medicine = Medicine.objects.get(pk=int(key))
-                create_event(horse=horse, medicine=medicine)
+                medicine = Medicine.objects.get(pk=int(key),
+                                                profile__id=profile.id)
+                create_event(request, horse=horse, medicine=medicine)
                 medicine.horses.add(horse)
             messages.success(request, "Medicine successfully added.")
             return HttpResponseRedirect(
@@ -431,18 +476,15 @@ class HorseView(LoginRequiredMixin, View):
             )
         elif parameters.get("_method") == "EDIT_TEMPS":
             del parameters['_method']
-            horse = Horse.objects.get(pk=pk)
-            print(parameters)
+            horse = Horse.objects.get(pk=pk, profile__id=profile.id)
             temp_med_form = TemporaryMedicineForm(parameters)
             if temp_med_form.is_valid():
-                print("this should exist")
                 temp_med_form.cleaned_data["horse"] = horse
                 medicine = Medicine.objects.create(
                     **temp_med_form.cleaned_data)
-                print(medicine)
                 medicine.horse = horse
                 medicine.save()
-                create_temp_event(horse=horse, medicine=medicine)
+                create_temp_event(request,horse=horse, medicine=medicine)
                 messages.success(
                     request,
                     "Temporary medicine successfully added."
@@ -451,11 +493,11 @@ class HorseView(LoginRequiredMixin, View):
                     reverse_lazy('records:review-horse', kwargs={"pk": pk})
                 )
             else:
-                print("this failed")
-                horse = Horse.objects.get(pk=pk)
+                horse = Horse.objects.get(pk=pk, profile__id=profile.id)
                 medicines = horse.medicine_set.all()
                 schedules = {}
-                add_medicines = Medicine.objects.exclude(id__in=medicines)
+                add_medicines = Medicine.objects.filter(
+                    profile__id=profile.id).exclude(id__in=medicines)
                 add_medicines = add_medicines.filter(horse__isnull=True)
                 for medicine in medicines:
                     schedules[medicine.id] = medicine.schedules.all()
@@ -464,7 +506,8 @@ class HorseView(LoginRequiredMixin, View):
                 for medicine in add_medicines:
                     add_schedules[medicine.id] = medicine.schedules.all()
                 temporary_medicines = Medicine.objects.filter(
-                    date_to_start__isnull=False, horse__pk=pk)
+                    date_to_start__isnull=False, horse__pk=pk,
+                    profile__id=profile.id)
                 messages.error(request, "Temporary medicine creation failed.")
                 return render(request,
                               'records/horse_view.html',
@@ -499,6 +542,8 @@ class CreateHorse(LoginRequiredMixin, View):
         return delta
 
     def post(self, request):
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
         parameters = request.POST.copy()
         dob = parameters.get("dob", 0)
         year = dob[6:]
@@ -520,8 +565,10 @@ class CreateHorse(LoginRequiredMixin, View):
                 }
             )
         horse = form.save()
+        horse.profile = profile
+        horse.save()
         messages.success(request, "Horse successfully created.")
-        create_birth_event(horse, horse.dob)
+        create_birth_event(request, horse, horse.dob)
         return HttpResponseRedirect(
             reverse_lazy('records:apply-medicine', kwargs={'pk': horse.id})
         )
@@ -539,9 +586,11 @@ class CreateHorse(LoginRequiredMixin, View):
 
 @login_required
 def delete_horse(request, pk):
-    horse = Horse.objects.get(pk=pk)
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    horse = Horse.objects.get(pk=pk, profile__id=profile.id)
     if horse:
-        delete_event(horse=horse)
+        delete_event(request, horse=horse, delete=True)
         horse.delete()
         messages.success(request, "Horse successfully deleted.")
         return HttpResponseRedirect(reverse_lazy("records:horse-list"))

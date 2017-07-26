@@ -41,7 +41,8 @@
     <script type="text/javascript" src="{% static 'js/moment.js' %}"></script>
     <!-- Bootstrap-Datepicker -->
     <script type="text/javascript" src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
-    
+    <!-- Slides -->
+    <script type="text/javascript" src="{% static 'js/jquery.slides.js' %}"></script>
     {% fullcalendar_css %}
     {% fullcalendar_print_css %}
     
@@ -54,7 +55,7 @@
 
 	
 
-
+    {% include 'partials/home_navbar.html' %}
 
     {% if messages %}
         <div class="container">

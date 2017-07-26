@@ -9,6 +9,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from fullcalendar.util import events_to_json, calendar_options
 from records.models import CalendarEvent, Horse, Medicine
 from farms.models import Farm
+from session.models import Profile
+
 
 OPTIONS = """{  timeFormat: "H:mm",
                 header: {
@@ -50,8 +52,11 @@ OPTIONS = """{  timeFormat: "H:mm",
 
 @login_required
 def print_today(request):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     today_events = CalendarEvent.objects.filter(
-        start=date.today()).exclude(title__icontains="born")
+        start=date.today(),
+        profile__id=profile.id).exclude(title__icontains="born")
     today = date.today()
     return render(
         request,
@@ -72,8 +77,11 @@ def index(request):
     """
     event_url = 'all_events/'
     today = date.today()
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
     today_events = CalendarEvent.objects.filter(
-        start=date.today()).exclude(title__icontains="born")
+        start=date.today(),
+        profile__id=profile.id).exclude(title__icontains="born")
     return render(
         request,
         'records/index.html',
@@ -90,7 +98,9 @@ def all_events(request):
     """
     JSON endpoint for all calendar events.
     """
-    events = CalendarEvent.objects.all()
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    events = CalendarEvent.objects.all().filter(profile__id=profile.id)
     return HttpResponse(
         events_to_json(events),
         content_type='application/json'
@@ -100,15 +110,17 @@ def all_events(request):
 class SearchList(LoginRequiredMixin, View):
 
     def get(self, request):
+        user = request.user
+        profile = Profile.objects.get(user__id=user.id)
         search_term = request.GET.get("search", None)
-        print("search: " + search_term)
         horses = Horse.objects.none()
         medicines = Medicine.objects.none()
         if (search_term is not None and search_term.find(" ") > -1):
             search_term = search_term.split()
             for keyword in search_term:
                 add = Horse.objects.filter(
-                    Q(name__icontains=keyword) | Q(notes__icontains=keyword) |
+                    Q(name__icontains=keyword) |
+                    Q(notes__icontains=keyword) |
                     Q(farm__name__icontains=keyword) |
                     Q(farm__address__icontains=keyword))
                 horses = list(chain(horses, add))
@@ -119,17 +131,22 @@ class SearchList(LoginRequiredMixin, View):
         elif search_term is not None:
             horses = Horse.objects.filter(
                 Q(name__icontains=search_term) |
-                Q(notes__icontains=search_term)
+                Q(notes__icontains=search_term) |
+                Q(farm__address__icontains=search_term) |
+                Q(farm__name__icontains=search_term)
             )
             medicines = Medicine.objects.filter(
                 Q(name__icontains=search_term) |
                 Q(notes__icontains=search_term)
             )
-        print(horses)
         distinct_horses = {}
         horse_keys = []
         distinct_medicines = {}
         medicine_keys = []
+
+        # Only allow horses and medicines from the request profile
+        horses = horses.filter(profile__id=profile.id)
+        medicines = medicines.filter(profile__id=profile.id)
         for horse in horses:
             if horse.id not in distinct_horses:
                 distinct_horses[horse.id] = horse
@@ -139,8 +156,10 @@ class SearchList(LoginRequiredMixin, View):
                 distinct_medicines[medicine.id] = medicine
                 medicine_keys.append(medicine.id)
         schedules = {}
-        horses = Horse.objects.filter(pk__in=horse_keys)
-        medicines = Medicine.objects.filter(pk__in=medicine_keys)
+        horses = Horse.objects.filter(pk__in=horse_keys,
+            profile__id=profile.id)
+        medicines = Medicine.objects.filter(pk__in=medicine_keys,
+            profile__id=profile.id)
         for medicine in medicines:
             schedules[medicine.id] = medicine.schedules.all()
         years = {}

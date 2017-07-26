@@ -26,8 +26,23 @@
                 </div>
             </li>
         </ul>
-        <form class="form form-inline waves-effect waves-light" action="{% url 'records:search' %}" method="GET">
-            <input name="search" id="navSearch" class="form-control" type="text" placeholder="Search">
-        </form>
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <form class="form form-inline waves-effect waves-light" action="{% url 'records:search' %}" method="GET">
+                    <input name="search" id="navSearch" class="form-control" type="text" placeholder="Search">
+                </form>
+            </li>
+            <li class="nav-item dropdown btn-group" style="padding-right: 100px">
+                <a class="nav-link dropdown-toggle" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-cog fa-lg" aria-hidden="true"></i>
+                </a>
+                <div class="dropdown-menu dropdown" aria-labelledby="dropdownMenu2">
+                    <a class="nav-link" href="{% url 'session:logout' %}">Logout</a>
+                    <a class="nav-link" href=" url 'session:contact'">Contact Us</a>
+                    <a class="nav-link" href=" url 'session:contact'">Account Settings</a>
+                </div>
+            </li>
+        </ul>
+        
     </div>
 </nav>

@@ -32,10 +32,10 @@
                         {% with farm.id as num %}
                         <tr>
                             <td>{{farm.name}}</td>
-                            <td>{% if farm.addres %} {{farm.address}} {% endif %}</td>
-                            <td><a href="{% url 'farms:edit-farm' pk=farm.id" class="btn btn-info">Edit</a></td>
+                            <td>{% if farm.address %} {{farm.address}} {% endif %}</td>
+                            <td><a href="{% url 'farms:review-farm' pk=farm.id %}" class="btn btn-info">Edit</a></td>
                             <td>
-                                <form class="form" action="{% url 'records:delete-farm' pk=farm.id %}">
+                                <form class="form" action="{% url 'farms:delete-farm' pk=farm.id %}">
                                     <button type="button" class="btn btn-danger btn-sm submitter" >Delete</button>
                                 </form>
                             </td>

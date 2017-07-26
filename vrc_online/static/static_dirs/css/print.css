@@ -9,3 +9,11 @@ h3::first-letter {
     margin: 0;
     padding: 0;
 }
+
+#slides {
+    display:none;
+}
+
+.slidejs-navigation {
+    display:none !important;
+}
