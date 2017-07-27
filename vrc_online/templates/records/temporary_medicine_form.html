@@ -35,7 +35,7 @@
                     Create a temporary medication.
                 </h3>
                 <div class="card-block">
-                    <form  class="form" action="" method="post">
+                    <form id="tempMed"  class="form" action="" method="post">
                         {% csrf_token %}
                         <div class="md-form {% if form.name.errors %} has-errors {% endif %}">
                             <label for="{{form.name.id_for_label}}">{{form.name.label}}</label>
@@ -118,7 +118,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            <input type="submit" onclick="$(this).prop('disabled', true); $('#tempMed').submit()" value="Submit" class="btn btn-primary"/> 
                         </div>
                     </form>
                 </div>

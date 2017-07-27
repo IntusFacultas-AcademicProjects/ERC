@@ -59,7 +59,7 @@
 			</div>
 		</div>
 		<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-			<form class="form" action="" method="post">
+			<form id="scheduleForm" class="form" action="" method="post">
 			{{ formset.management_form }}
 				<div class="card text-center">
 					<h3 class="card-header default-color-dark white-text">
@@ -126,7 +126,7 @@
 				</div>
 				<div class="card-footer text-muted default-color-dark white-text">
 					<div class="form-group">
-						<input type="submit" value="Submit" class="btn btn-primary"/> 
+						<input type="submit" onclick="$(this).prop('disabled', true); $('#scheduleForm').submit()" value="Submit" class="btn btn-primary"/> 
 					</div>
 				</div>	
 			</form>

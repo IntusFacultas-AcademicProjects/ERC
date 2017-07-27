@@ -38,7 +38,7 @@
             </table>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 printButtonClass">
-            <form class="form" action="{% url 'records:medical-history' pk=horse.id %}" method="POST">
+            <form id="medHist" class="form" action="{% url 'records:medical-history' pk=horse.id %}" method="POST">
                 {% csrf_token %}
                  <div class="card text-center" style="margin-top:15px">
                     <h3 class="card-header default-color-dark white-text">

@@ -53,7 +53,7 @@
             </table>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-            <form class="form" action="" method="POST">
+            <form id="farmForm" class="form" action="" method="POST">
                 {% csrf_token %}
                 <div class="card text-center">
                     <h3 class="card-header default-color-dark white-text">
@@ -81,7 +81,7 @@
                     </div>
                      <div class="card-footer text-muted default-color-dark white-text">
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            <input type="submit" onclick="$(this).prop('disabled', true); $('#farmForm').submit()" value="Submit" class="btn btn-primary"/> 
                         </div>
                     </div>
                 </div>  

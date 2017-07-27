@@ -1,7 +1,9 @@
+import ast
+
 from django.db.models import Q
 from django.shortcuts import render
 from django.views import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -10,6 +12,33 @@ from farms.models import Farm
 from farms.forms import FarmForm
 from records.models import Horse
 from session.models import Profile
+
+
+@login_required
+def json_farm(request, pk):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    farm = Farm.objects.get(pk=pk, profile__id=profile.id)
+    horses = farm.horses.all()
+    dictionary = {}
+    for horse in horses:
+        dictionary[horse.id] = {
+            "id": horse.id,
+        }
+    return JsonResponse(dictionary)
+
+
+@login_required
+def json_horses(request):
+    user = request.user
+    profile = Profile.objects.get(user__id=user.id)
+    horses = Horse.objects.filter(profile__id=profile.id, farm__isnull=False)
+    dictionary = {}
+    for horse in horses:
+        dictionary[horse.id] = {
+            "id": horse.id,
+        }
+    return JsonResponse(dictionary)
 
 
 class FarmList(LoginRequiredMixin, View):
@@ -63,16 +92,14 @@ class FarmView(LoginRequiredMixin, View):
         user = request.user
         profile = Profile.objects.get(user__id=user.id)
         farm = Farm.objects.get(pk=pk, profile__id=profile.id)
-        farm_horses = farm.horses.all()
         horses = Horse.objects.all().filter(
-            profile__id=profile.id).exclude(id__in=farm_horses)
+            profile__id=profile.id)
         form = FarmForm(instance=farm)
         return render(
             request,
             'farms/farm_view.html',
             {
                 "form": form,
-                "farm_horses": farm_horses,
                 "horses": horses,
                 "farm": farm,
             }
@@ -83,11 +110,18 @@ class FarmView(LoginRequiredMixin, View):
         profile = Profile.objects.get(user__id=user.id)
         farm = Farm.objects.get(pk=pk, profile__id=profile.id)
         _method = request.POST.get("_method")
-        if _method == "ADD_HORSES":
-            for horseid in request.POST.get("horses"):
-                horse = Horse.objects.get(pk=horseid, profile__id=profile.id)
-                farm.horses.add(horse)
-            messages.success(request, "Horses successfully added to farm.")
+        if _method == "EDIT_HORSES":
+            horses = request.POST.getlist("horses", None)
+            farm.horses.clear()
+            if horses is not None:
+                for horseid in horses:
+                    horse = Horse.objects.get(
+                        pk=int(horseid),
+                        profile__id=profile.id
+                    )
+                    farm.horses.add(horse)
+                farm.save()
+                messages.success(request, "Horses successfully updated.")
             return HttpResponseRedirect(
                 reverse_lazy("farms:review-farm", kwargs={"pk": pk})
             )
@@ -103,26 +137,16 @@ class FarmView(LoginRequiredMixin, View):
                 return HttpResponseRedirect(
                     reverse_lazy("farms:review-farm", kwargs={"pk": pk})
                 )
-            farm_horses = farm.horses.all()
             horses = Horse.objects.all().filter(
-                profile__id=profile.id).exclude(id__in=farm_horses)
+                profile__id=profile.id)
             return render(
                 request,
                 'farms/farm_view.html',
                 {
                     "form": form,
-                    "farm_horses": farm_horses,
                     "horses": horses,
                     "farm": farm,
                 }
-            )
-        elif _method == "REMOVE_HORSES":
-            for horseid in request.POST.get("horses"):
-                horse = Horse.objects.get(pk=horseid, profile__id=profile.id)
-                farm.horses.remove(horse)
-            messages.success(request, "Horses successfully removed from farm.")
-            return HttpResponseRedirect(
-                reverse_lazy("farms:review-farm", kwargs={"pk": pk})
             )
 
 

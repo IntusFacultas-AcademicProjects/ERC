@@ -7,39 +7,66 @@
         <div class="card col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
             <div class="card-block">
                 <h4 class="card-title">What's this?</h4>
-                <p class="card-text" >Add or remove horses from {{farm.name}}</p> 
+                <p class="card-text" >Add or remove horses from {{farm.name}} using the panes on your left. Simply click a horse from the left pane to add it to the farm (it's name will appear in the right pane). Click a horse's name from the right pane to remove it from the farm (it's name will appear in the left pane). Don't forget to hit submit though!</p> 
             </div>
         </div>
     </div>
     <div class="row" style="margin-top:15px">
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <form class="form" action="" method="POST">
-                <input type="hidden" name="_method" value="ADD_HORSES">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <form id="EDITHORSE" class="form" action="" method="POST">
+                <input type="hidden" name="_method" value="EDIT_HORSES">
                 {% csrf_token %}
                 <div class="card text-center">
                     <h3 class="card-header default-color-dark white-text">
-                        Add Horses to {{farm.name}}.
+                        Edit Horses in {{farm.name}}.
                     </h3>
                     <div class="card-block">
-                        <label for="horses">
-                            Select one or more horses to add to {{farm.name}}
-                            <select style="width:100%" class="multi-drop" id="horses" multiple="multiple" name="horses">
-                            {% for horse in horses %}
-                                <option value="{{horse.id}}">{{horse.name}}</option>
-                            {% endfor %}
-                            </select>
-                        </label>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-right:0">
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <label for="addhorses" class='control-label'>Add Horses</label>
+                                        <select id="addhorses" class="dual-list-box" style="height:183px; width:100%; overflow-y:scroll" multiple="multiple">
+                                        {% for horse in horses %}
+                                             <option class="add" value="{{horse.id}}" id="add-{{horse.id}}">{{horse.name}}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                        <button class="btn btn-primary btn-block" type="button" id="addAll"><i class="fa fa-angle-double-right fa-lg" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6" style="padding-left:15px">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding-left:0">
+                                    <label for="removehorses" class='control-label'>Remove Horses</label>
+                                    <select name="horses" id="removehorses" class="dual-list-box" style="height:183px; width:100%; overflow-y:scroll" multiple="multiple">
+                                        {% for horse in horses %}
+                                            <option class="remove ie-patch-hidden" value="{{horse.id}}" id="remove-{{horse.id}}" style="display:none">{{horse.name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="padding-left:0">
+                                    <button type="button" class="btn btn-primary btn-block" id="removeAll">
+                                        <i class="fa fa-angle-double-left fa-lg" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer text-muted default-color-dark white-text">
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            <input type="submit" onclick="$(this).prop('disabled', true); $('#EDITHORSE').submit()" value="Submit" class="btn btn-primary"/> 
                         </div>
                     </div>
                 </div>
             </form>
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <form class="form" action="" method="POST">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+            <form id="EDITFARM" class="form" action="" method="POST">
                 <input type="hidden" name="_method" value="EDIT_FARM">
                 {% csrf_token %}
                 <div class="card text-center">
@@ -58,33 +85,7 @@
                     </div>
                     <div class="card-footer text-muted default-color-dark white-text">
                         <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <form class="form" action="" method="POST">
-                <input type="hidden" name="_method" value="REMOVE_HORSES">
-                {% csrf_token %}
-                <div class="card text-center">
-                    <h3 class="card-header default-color-dark white-text">
-                        Remove Horses from {{farm.name}}.
-                    </h3>
-                    <div class="card-block">
-                        <label for="horses">
-                            Select one or more horses to remove from {{farm.name}}
-                            <select style="width:100%" class="multi-drop" id="horses" multiple="multiple" name="horses">
-                            {% for horse in farm_horses %}
-                                <option value="{{horse.id}}">{{horse.name}}</option>
-                            {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div class="card-footer text-muted default-color-dark white-text">
-                        <div class="form-group">
-                            <input type="submit" value="Submit" class="btn btn-primary"/> 
+                            <input type="submit" onclick="$(this).prop('disabled', true); $('#EDITFARM').submit()" value="Submit" class="btn btn-primary"/> 
                         </div>
                     </div>
                 </div>
@@ -96,20 +97,99 @@
 
 {% block js %}
 <script type="text/javascript">
-    $(document).ready(function() {
-        $.fn.enterKey = function (fnc) {
-            return this.each(function () {
-                $(this).keypress(function (ev) {
-                    var keycode = (ev.keyCode ? ev.keyCode : ev.which);
-                    if (keycode == '13') {
-                        fnc.call(this, ev);
-                    }
-                })
-            })
+    var toggle = function($item) {
+        var name = $($item).attr("id")
+        if (name.indexOf("add") > -1) {
+            var opposite = "#remove-" + $($item).val()
+            console.log("Showing " + opposite)
+            $(opposite).show()
+            $(opposite).removeClass("ie-patch-hidden")
+            $(opposite).removeAttr("disabled")
+            $($item).hide()
+            $($item).addClass("ie-patch-hidden")
+            $($item).removeAttr("selected")
+            $($item).attr('disabled','disabled')
+            $(opposite).attr("selected", "selected")
         }
-        $( ".multi-drop" ).select2({
-            theme: "bootstrap"
+        else {
+            var opposite = "#add-" + $($item).val()
+            console.log("Showing " + opposite)
+            $(opposite).show()
+            $(opposite).removeClass("ie-patch-hidden")
+            $(opposite).removeAttr("disabled")
+            $($item).hide()
+            $($item).addClass("ie-patch-hidden")
+            $($item).removeAttr("selected")
+            $($item).attr('disabled','disabled')
+            $(opposite).attr("selected", "selected")
+        }
+        console.log($("#addhorses").val())
+    }
+    $(document).ready(function() {
+        $.get({
+            url: "{% url 'farms:json-horses' %}",
+            success: function(res) {
+                var all_with_farms = res
+                console.log("Ones with farms")
+                console.log(all_with_farms)
+                $.get({
+                    url: "{% url 'farms:json-farm' pk=farm.id%}",
+                    success: function(res) {
+                        console.log("Ones with this farm")
+                        console.log(res)
+                        for (horse in all_with_farms) {
+                            console.log(horse in res)
+                            if (horse in res) {
+
+                            }
+                            else {
+                                $item = "#add-" + horse
+                                $($item).hide()
+                                $($item).addClass("ie-patch-hidden")
+                                $($item).removeAttr("selected")
+                                $($item).attr('disabled','disabled')
+                            }
+                        }
+                        for (horse in res) {
+                            $item = "#add-" + horse
+                            toggle($($item))
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error)
+                    },
+                    dataType: "json"
+                });
+            },
+            error: function(error) {
+                console.log(error)
+            },
+            dataType: "json"
         });
-    }) 
+        
+        $("option").on("click", function() {
+            toggle($(this))
+        })  
+        $("#removeAll").on("click", function() {
+            $(".remove").each(function() {
+                toggle($(this))
+            })
+        })
+        $("#addAll").on("click", function() {
+            $(".add").each(function() {
+                toggle($(this))
+            })
+        })
+
+        // Only run on IE since option click is not supported
+        if(/MSIE \d|Trident.*rv:/.test(navigator.userAgent)) {
+            $("#removehorses").click(function(){
+                    toggle($(this).children("option:selected"))
+            });
+            $("#addhorses").click(function(){
+                    toggle($(this).children("option:selected"))
+            });
+        }
+    })
 </script>
 {% endblock js %}

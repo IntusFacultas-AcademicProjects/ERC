@@ -100,7 +100,7 @@
                         Apply Medicines, check all that apply.
                     </h3>
                 </div>
-            <form class="form" action="" method="post">
+            <form id="form" class="form" action="" method="post">
                 <div class="card-block" style="height:400px; overflow-y:scroll">
                     {% csrf_token %}
                     {% if medicines %}
@@ -167,7 +167,7 @@
                 </div>
                 <div class="card-footer text-muted default-color-dark white-text">
                     <div class="form-group">
-                        <input type="submit" value="Submit" class="btn btn-primary"/> 
+                        <input type="submit" onclick="$(this).prop('disabled', true); $('#form').submit()" value="Submit" class="btn btn-primary"/> 
                     </div>
                 </div>  
             </form>
