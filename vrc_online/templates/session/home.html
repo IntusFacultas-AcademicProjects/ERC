@@ -3,15 +3,67 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-  <h2>Future Landing Page</h2>
+    <div class="container-fluid">
+        <div class="row" style="margin-top:15px">
+            <div class="col-lg-8 col-md-2 col-sm-2 col-xs-2">
+                <div id="slides" class="blur-box" >
+                    <img src="{% static 'img/image1.jpeg' %}">
+                    <img src="{% static 'img/image3.png' %}">
+                    <img src="{% static 'img/image2.jpeg' %}">
+                    <img src="{% static 'img/image4.jpeg' %}">
+                    <img src="{% static 'img/image5.jpeg' %}">
+                </div>
+            </div>
+             <div class="col-lg-4 col-md-10 col-sm-10 col-xs-10">
+                <div class='row'>
+                    <div class="col-lg-12">
+                        <div class="card text-center">
+                            <h2 class="card-header default-color-dark white-text">
+                                Welcome to Equestrian Recordkeeping and Care
+                            </h2>
+                            <div class="card-block">
+                            <p style="text-align:left; font-size:1.5em">
+                                It's our pleasure to provide for you a stable, digital, easy to use,
+                                and secure means to manage the logistics of your profession 
+                                so that you can spend more time doing what you enjoy.
 
-  <div id="slides" class="blur-box" style="width:60%; height: 30%">
-    <img src="{% static 'img/image1.jpeg' %}">
-    <img src="{% static 'img/image3.png' %}">
-    <img src="{% static 'img/image2.jpeg' %}">
-    <img src="{% static 'img/image4.jpeg' %}">
-    <img src="{% static 'img/image5.jpeg' %}">
-  </div>
+                                <br><br>
+
+                                We believe that every equestrian caretaker deserves the ability
+                                to shift the organizational burden of paperwork and schedules off their shoulders. 
+                                If you want to see a new feature that you think might make your life easier, we want to hear about it!
+                                Please do not hesitate to contact us.
+
+                                <br><br>
+
+                                Sincerely, <br>
+
+                                The ERC Team.
+                            </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px">
+                    <div class="col-lg-12">
+                        <div class="card text-center">
+                            <h2 class="card-header default-color-dark white-text">
+                                Tutorial
+                            </h2>
+                            <div class="card-block">
+                                <p style="text-align:left; font-size:1em">
+                                    While we have strived to design ERC to be as intuitive as possible, we still recommend you watch the tutorial before continuing. <br><br> 
+
+                                    <a href="">Click here to watch</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block js %}
@@ -36,7 +88,7 @@
                 // [boolean] Start playing the slideshow on load.
               swap: false,
                 // [boolean] show/hide stop and play buttons
-              pauseOnHover: true,
+              pauseOnHover: false,
                 // [boolean] pause a playing slideshow on hover
               restartDelay: 2500
                 // [number] restart delay on inactive slideshow

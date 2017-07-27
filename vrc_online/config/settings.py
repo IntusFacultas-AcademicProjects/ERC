@@ -16,12 +16,12 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PWD = os.path.dirname(os.path.realpath(__file__))
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 
 # STATICFILES_DIRS = ( )
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static', 'static_dirs'),
+    os.path.join(BASE_DIR, 'static'),
     # os.path.join(BASE_DIR, 'config', 'static', 'static_dirs'),
 )
 SETTINGS_PATH = os.path.dirname(__file__)
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'records',
     'fullcalendar',
     'widget_tweaks',
+    'django_extensions',
     'farms',
     'session'
 ]
