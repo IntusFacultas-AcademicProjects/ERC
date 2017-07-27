@@ -9,6 +9,9 @@ urlpatterns = [
     url(r'^login/$', auth_views.LoginView.as_view(), name="login"),
     url(r'^logout/$', views.logoutUser, name="logout"),
     url(r'^about/$', views.about, name="about"),
+    url(r'^account/$', views.AccountUpdate.as_view(), name="account-details"),
+    url(r'^account/contact/$', views.contact, name="contact-signed"),
+    url(r'^contact/$', views.contact_unsigned, name="contact-unsigned"),
     url(
         r'^password_reset/$',
         views.password_reset,

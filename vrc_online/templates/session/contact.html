@@ -1,0 +1,34 @@
+{% extends 'records/base.html' %}
+{% block title %}Contact - {{ block.super }}{% endblock %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="container">
+    <form role="form" style="margin-top:1em" action="" method="post">
+        {% csrf_token %}
+        <div class="card text-center">
+            <h2 class="card-header default-color-dark white-text">
+                Contact Us
+            </h2>
+            <div class="card-block">
+                <div class="row form-group">
+                    <label for="{{form.contact_name.id_for_label}}">{{form.contact_name.label}}</label>
+                    {% render_field form.contact_name class+="form-control" %}
+                </div>
+                <div class="row form-group">
+                    <label for="{{form.contact_email.id_for_label}}">{{form.contact_email.label}}</label>
+                    {% render_field form.contact_email class+="form-control" %}
+                </div>
+                <div class="row form-group">
+                    <label for="{{form.content.id_for_label}}">{{form.content.label}}</label>
+                    {% render_field form.content class+="md-textarea" %}
+                </div>
+            </div>
+            <div class="card-footer text-muted default-color-dark white-text">
+                <div class="form-group">
+                    <input type="submit" onclick="$(this).prop('disabled', true); $('#signForm').submit()" value="Sign up" class="btn btn-primary"/> 
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

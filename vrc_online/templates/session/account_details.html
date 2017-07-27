@@ -1,0 +1,98 @@
+{% extends 'records/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+	<div class="container-fluid">
+		<div class="row" style="margin-top:15px">
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+				<div class="card text-center" style="margin-top:15px">
+	                <h3 class="card-header default-color-dark white-text">
+	                    Change Account Details.
+	                </h3>
+	                <div class="card-block">
+	                	<form id="accountForm" method="post">
+							{% csrf_token %}
+	                		<div class="row form-group">
+				                <label for="{{account_form.username.id_for_label}}">{{account_form.username.label}}</label>
+				                {% render_field account_form.username class+="form-control" %}
+				                {% if account_form.username.errors %}
+	                                {%  for error in account_form.username.errors %}
+	                                     <li style="color:red"> {{ error }} </li>
+	                                {% endfor %}
+	                            {% endif %}
+				            </div>
+				            <div class="row form-group">
+				                <label for="{{account_form.email.id_for_label}}">{{account_form.email.label}}</label>
+				                {% render_field account_form.email class+="form-control" %}
+				                {% if account_form.email.errors %}
+	                                {%  for error in account_form.email.errors %}
+	                                     <li style="color:red"> {{ error }} </li>
+	                                {% endfor %}
+	                            {% endif %}
+				            </div>
+							<input type="hidden" name="_method" value="update">
+	                </div>
+	                <div class="card-footer text-muted default-color-dark white-text">
+	                    <div class="form-group">
+	                        <input type="submit" onclick="$(this).prop('disabled', true); $('#accountForm').submit()" value="Submit" class="btn btn-primary"/> 
+	                    </div>
+						</form>
+                	</div>
+                </div> 
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+				<div class="card text-center" style="margin-top:15px">
+	                <h3 class="card-header default-color-dark white-text">
+	                    Change Password.
+	                </h3>
+	                <div class="card-block">
+						<form id="passwordForm" method="post">
+	                	<input type="hidden" name="_method" value="password">
+							{% csrf_token %}
+							<div class="row form-group">
+				                <label for="{{form.old_password.id_for_label}}">{{form.old_password.label}}</label>
+				                {% render_field form.old_password class+="form-control" %}
+				                {% if form.old_password.errors %}
+	                                {%  for error in form.old_password.errors %}
+	                                     <li style="color:red"> {{ error }} </li>
+	                                {% endfor %}
+	                            {% endif %}
+				            </div>
+				            <div class="row form-group">
+				                <label for="{{form.new_password1.id_for_label}}">{{form.new_password1.label}}</label>
+				                {% render_field form.new_password1 class+="form-control" %}
+				                {% if form.new_password1.errors %}
+	                                {%  for error in form.new_password1.errors %}
+	                                     <li style="color:red"> {{ error }} </li>
+	                                {% endfor %}
+	                            {% endif %}
+				            </div>
+				             <div class="row form-group">
+				                <label for="{{form.new_password2.id_for_label}}">{{form.new_password2.label}}</label>
+				                {% render_field form.new_password2 class+="form-control" %}
+				                {% if form.new_password2.errors %}
+	                                {%  for error in form.new_password2.errors %}
+	                                     <li style="color:red"> {{ error }} </li>
+	                                {% endfor %}
+	                            {% endif %}
+				            </div>
+	                </div>
+	                <div class="card-footer text-muted default-color-dark white-text">
+	                    <div class="form-group">
+	                        <input type="submit" onclick="$(this).prop('disabled', true); $('#passwordForm').submit()" value="Submit" class="btn btn-primary"/> 
+	                    </div>
+						</form>
+                	</div>
+                </div> 
+				
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block js %}
+	<script type="text/javascript">
+</script>
+{% endblock js %}
